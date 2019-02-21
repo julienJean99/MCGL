@@ -6,8 +6,6 @@
 # // Makefile
 # //
 
-SRC = src/modular/new.c
-
 OBJ = $(SRC:.c=.o)
 
 CC = gcc
@@ -16,7 +14,17 @@ NAME = libMcgl.so
 
 LDFLAGS = -shared
 
-CFLAGS = -fPIC -W -Wall -Wextra -Iinclude/
+CFLAGS = -fPIC -W -Wall -Wextra -Iinclude/ -g3
+
+CLASS = window.c
+
+MODULAR = new.c
+
+INTERNAL = connect_to_server.c
+
+SRC = $(addprefix src/modular/, $(MODULAR))	\
+	$(addprefix src/class/, $(CLASS))			\
+	$(addprefix src/internal/, $(INTERNAL))
 
 all: $(NAME)
 

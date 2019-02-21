@@ -12,23 +12,23 @@ INCLUDE = -I$(ROOT)include/
 
 SRC_BASE = $(ROOT)src
 
-SRC =
+SRC = main.c
 
 OBJ = $(SRC:.c=.o)
 
 CC = clang
 
-NAME = Unit_test
+NAME = functional_test
 
-LDFLAGS = -lcriterion --coverage
+LDFLAGS = -L.. -lMcgl -lX11 $(INCLUDE)
 
-CFLAGS = -W -all -Wextra --coverage $(INCLUDE)
+CFLAGS = -W -Wall -Wextra $(INCLUDE)
 
 all: $(NAME)
 
 $(NAME): $(OBJ)
 	$(CC) -o $(NAME) $(OBJ) $(LDFLAGS)
-	./$(NAME)
+
 clean:
 	find $(ROOT) -name "*.gcda" -delete
 	find $(ROOT) -name "*.gcno" -delete
