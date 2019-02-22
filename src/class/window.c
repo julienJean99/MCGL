@@ -14,11 +14,11 @@
 typedef struct
 {
     mc_window window;
-    XEvent *_event;
+    XEvent _event;
     Window _window;
     GC _gc;
     Display *_display;
-    void (*_loop)(Object *, void *ret);
+    loop _loop;
     int _bcColor;
     int _frColor;
 } mc_windowPr;
@@ -36,49 +36,51 @@ static void windowDtor(
 {
     XUnmapWindow(this->_display, this->_window);
     XDestroyWindow(this->_display, this->_window);
+    free(this->_gc);
     disconnectToServer(this->_display);
-    free(this->_event);
 }
 
-static void *start_update(
+static int start_update(
     mc_windowPr *this)
 {
-    size_t wait = 10000;
-    void *ret = NULL;
+    int ret = 0;
+    long eventM = ExposureMask | KeyPressMask | KeyReleaseMask |
+        PointerMotionMask | ButtonPressMask | ButtonReleaseMask |
+        StructureNotifyMask;
 
-    if (!this->_loop)
-        return (NULL);
-    while (wait) {
-        --wait;
-        XNextEvent(this->_display, this->_event);
+    while (1) {
+        while (XCheckMaskEvent(this->_display, eventM, &this->_event))
+            if (this->_event.type == DestroyNotify)
+                break;
         XClearWindow(this->_display, this->_window);
-        if (this->_event->type == MapNotify)
-            break;
-        this->_loop(this, ret);
-        XFlush(this->_display);
+        ret = this->_loop(this);
     }
     return (ret);
 }
 
-static void *open(
+static int open(
     Object *_this)
 {
     mc_windowPr *this = _this;
-    Display *dpy = connectToServer();
-    XEvent *event = malloc(sizeof(XEvent));
-    XSetWindowAttributes attribute = {
-    .event_mask = StructureNotifyMask};
+    long eventM = ExposureMask | KeyPressMask | KeyReleaseMask |
+        PointerMotionMask | ButtonPressMask | ButtonReleaseMask |
+        StructureNotifyMask;
+    XSetWindowAttributes attribute = {};
 
-    if (!dpy || !event){
-        free(dpy);
-        free(event);
-        return (NULL);
+    this->_display = connectToServer();
+    if (!this->_display){
+        free(this->_display);
+        return (-1);
     }
-    printf("looks fine %u %u\n",
-        this->window.width, this->window.height);
+    this->_bcColor = BlackPixel(
+        this->_display,
+        DefaultScreen(this->_display));
+    this->_frColor =  WhitePixel(
+        this->_display,
+        DefaultScreen(this->_display));
     this->_window = XCreateWindow(
-        dpy,
-        XDefaultRootWindow(dpy),
+        this->_display,
+        XDefaultRootWindow(this->_display),
         0, 0,
         this->window.width, this->window.height,
         0,
@@ -87,26 +89,20 @@ static void *open(
         CopyFromParent,
         0,
         &attribute);
-    printf("looks fine\n");
-    this->_bcColor = BlackPixel(dpy, DefaultScreen(dpy));
-    this->_frColor =  WhitePixel(dpy, DefaultScreen(dpy));
-    this->_event = event;
-    this->_display = dpy;
-    XMapWindow(this->_display, this->_window);
     this->_gc = XCreateGC(this->_display, this->_window, 0, 0);
     XSetForeground(this->_display, this->_gc, this->_frColor);
     XSetBackground(this->_display, this->_gc, this->_bcColor);
-    XFlush(this->_display);
+    XSelectInput(this->_display, this->_window, eventM);
+    XMapWindow(this->_display, this->_window);
     while (1) {
-        printf("nope\n");
-        XNextEvent(this->_display, this->_event);
-        if (this->_event->type == MapNotify)
+        XNextEvent(this->_display, &this->_event);
+        if (this->_event.type == MapNotify)
             break;
     }
     if (this->_loop) {
         return (start_update(this));
     }
-    return (NULL);
+    return (-1);
 }
 
 static void setLoop(
@@ -138,7 +134,7 @@ static mc_windowPr _description = {
      .width = 0,
      .height = 0,
     },
-    ._event = NULL,
+    ._event = {},
     ._window = 0,
     ._gc = 0,
     ._display = NULL,

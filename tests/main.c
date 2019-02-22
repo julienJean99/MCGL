@@ -10,20 +10,22 @@
 #include "class/mc_window.h"
 #include "modular/new.h"
 
-void update(__attribute__((unused)) mc_window *this, int *ret)
+int update(__attribute__((unused)) mc_window *this)
 {
-    printf("Loop\n");
-    *ret = 4;
+    return (4);
 }
 
 int main()
 {
     mc_window *window = new(mc_Window, 300, 500);
+    int ret = 0;
 
     if (!window) {
         printf("Oops\n");
         return (84);
     }
     window->setLoop(window, (loop)update);
-    return (*(int *)window->open(window));
+    ret = window->open(window);
+    delete(window);
+    return (ret);
 }

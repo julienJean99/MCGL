@@ -22,7 +22,7 @@ NAME = functional_test
 
 LDFLAGS = -L.. -lMcgl -lX11 $(INCLUDE)
 
-CFLAGS = -W -Wall -Wextra $(INCLUDE)
+CFLAGS = -W -Wall -Wextra $(INCLUDE) -g3
 
 all: $(NAME)
 

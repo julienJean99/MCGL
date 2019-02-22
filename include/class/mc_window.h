@@ -11,14 +11,14 @@
 
 # include "modular/object.h"
 
-typedef void (*loop)(Object *, void *);
+typedef int (*loop)(Object *);
 
 typedef struct
 {
     Class base;
 
     /* Call the function at every update */
-    void *(*open)(Object *);
+    int (*open)(Object *);
     /* Set the function to call on update */
     void (*setLoop)(Object *, loop func);
     unsigned int width;
