@@ -8,6 +8,7 @@
 
 #include <stdarg.h>
 #include <X11/Xlib.h>
+#include <X11/Xatom.h>
 #include "class/mc_window.h"
 #include "internal/server_connection.h"
 
@@ -21,6 +22,7 @@ typedef struct
     loop _loop;
     int _bcColor;
     int _frColor;
+    Atom _delWin;
 } mc_windowPr;
 
 static void windowCtor(
@@ -44,14 +46,15 @@ static int start_update(
     mc_windowPr *this)
 {
     int ret = 0;
-    long eventM = ExposureMask | KeyPressMask | KeyReleaseMask |
-        PointerMotionMask | ButtonPressMask | ButtonReleaseMask |
-        StructureNotifyMask;
 
     while (1) {
-        while (XCheckMaskEvent(this->_display, eventM, &this->_event))
-            if (this->_event.type == DestroyNotify)
-                break;
+        while (XPending(this->_display)) {
+            XNextEvent(this->_display, &this->_event);
+            printf("atom %d, %d\n", ClientMessage, this->_event.type);
+            if (this->_event.type == DestroyNotify ||
+                (this->_event.type == ClientMessage && this->_event.xclient.data.l[0] == (long)this->_delWin))
+                return (ret);
+        }
         XClearWindow(this->_display, this->_window);
         ret = this->_loop(this);
     }
@@ -89,10 +92,12 @@ static int open(
         CopyFromParent,
         0,
         &attribute);
+    this->_delWin = XInternAtom(this->_display, "WM_DELETE_WINDOW", True);
     this->_gc = XCreateGC(this->_display, this->_window, 0, 0);
     XSetForeground(this->_display, this->_gc, this->_frColor);
     XSetBackground(this->_display, this->_gc, this->_bcColor);
     XSelectInput(this->_display, this->_window, eventM);
+    XSetWMProtocols(this->_display, this->_window, &this->_delWin, 1);
     XMapWindow(this->_display, this->_window);
     while (1) {
         XNextEvent(this->_display, &this->_event);
@@ -141,6 +146,7 @@ static mc_windowPr _description = {
     ._loop = NULL,
     ._bcColor = 0,
     ._frColor = 0,
+    ._delWin = 0,
 };
 
 Class   *mc_Window = (Class *)&_description;
