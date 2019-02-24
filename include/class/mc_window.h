@@ -13,6 +13,8 @@
 
 typedef int (*loop)(Object *);
 
+struct mc_drawable;
+
 typedef struct
 {
     Class base;
@@ -21,13 +23,14 @@ typedef struct
     int (*open)(Object *);
     /* Set the function to call on update */
     void (*setLoop)(Object *, loop func);
+    /* draws a drawabel on the window */
+    int (*draw)(Object *, struct mc_drawable *);
     unsigned int width;
     unsigned int height;
 } mc_window;
 
 extern Class *mc_Window;
 
-/* type  */
-
+typedef int (*drawFunc)(Object *, mc_window *);
 
 #endif //_WINDOW_H_

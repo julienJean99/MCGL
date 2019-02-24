@@ -22,12 +22,13 @@ NAME = functional_test
 
 LDFLAGS = -L.. -lMcgl -lX11 $(INCLUDE)
 
-CFLAGS = -W -Wall -Wextra $(INCLUDE) -g3
+CFLAGS = -W -Wall -Wextra $(INCLUDE) -g
 
 all: $(NAME)
 
 $(NAME): $(OBJ)
 	$(CC) -o $(NAME) $(OBJ) $(LDFLAGS)
+	mv $(NAME) $(ROOT)
 
 clean:
 	find $(ROOT) -name "*.gcda" -delete
@@ -35,7 +36,7 @@ clean:
 	rm -f $(OBJ)
 
 fclean: clean
-	rm -f $(NAME)
+	rm -f $(ROOT)$(NAME)
 
 re: fclean all
 

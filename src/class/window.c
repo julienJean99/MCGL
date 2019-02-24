@@ -6,24 +6,11 @@
 /* // window class */
 /* // */
 
+#include <unistd.h>
 #include <stdarg.h>
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-#include "class/mc_window.h"
+#include "internal/window.h"
 #include "internal/server_connection.h"
-
-typedef struct
-{
-    mc_window window;
-    XEvent _event;
-    Window _window;
-    GC _gc;
-    Display *_display;
-    loop _loop;
-    int _bcColor;
-    int _frColor;
-    Atom _delWin;
-} mc_windowPr;
+#include "internal/interface/drawable.h"
 
 static void windowCtor(
     mc_windowPr *this,
@@ -50,12 +37,19 @@ static int start_update(
     while (1) {
         while (XPending(this->_display)) {
             XNextEvent(this->_display, &this->_event);
-            printf("atom %d, %d\n", ClientMessage, this->_event.type);
             if (this->_event.type == DestroyNotify ||
                 (this->_event.type == ClientMessage && this->_event.xclient.data.l[0] == (long)this->_delWin))
                 return (ret);
         }
-        XClearWindow(this->_display, this->_window);
+        XSetForeground(this->_display, this->_gc, this->_bcColor);
+        XFillRectangle(
+            this->_display,
+            this->_window,
+            this->_gc,
+            0, 0,
+            this->window.width,
+            this->window.height);
+        XSetForeground(this->_display, this->_gc, this->_frColor);
         ret = this->_loop(this);
     }
     return (ret);
@@ -119,10 +113,24 @@ static void setLoop(
     this->_loop = func;
 }
 
+int draw(
+    Object *_this,
+    struct mc_drawable *obj)
+{
+    mc_windowPr *this = _this;
+
+    if (obj->_usrDraw) {
+        return (obj->_usrDraw(obj, (mc_window *)this));
+    } else if (obj->_draw) {
+        return (obj->_draw(obj, this->_display, &this->_window, &this->_gc));
+    }
+    return (-1);
+}
+
 static mc_windowPr _description = {
     {{
         .__size__ = sizeof(mc_windowPr),
-        .__name__ = "Player",
+        .__name__ = "Window",
         .__ctor__ = (ctor_t)&windowCtor,
         .__dtor__ = (dtor_t)&windowDtor,
         .__str__ = NULL,
@@ -136,6 +144,7 @@ static mc_windowPr _description = {
         },
      .open = &open,
      .setLoop = &setLoop,
+     .draw = &draw,
      .width = 0,
      .height = 0,
     },

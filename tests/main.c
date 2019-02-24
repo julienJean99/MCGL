@@ -1,3 +1,4 @@
+
 /* // */
 /* // This document created by Julien JEAN */
 /* // For project : window */
@@ -6,13 +7,24 @@
 /* // test */
 /* // */
 
+#include <unistd.h>
 #include <stdio.h>
 #include "class/mc_window.h"
 #include "modular/new.h"
+#include "class/drawable/point.h"
 
-int update(__attribute__((unused)) mc_window *this)
+int update(mc_window *window)
 {
-    return (4);
+    static mc_point *point = NULL;
+
+    if (point == NULL) {
+        point = new(mc_Point, 10, 10);
+    }
+    if (point == NULL) {
+        return (-1);
+    }
+    window->draw(window, (struct mc_drawable *)point);
+    return (0);
 }
 
 int main()
@@ -24,7 +36,7 @@ int main()
         printf("Oops\n");
         return (84);
     }
-    window->setLoop(window, (loop)update);
+    window->setLoop(window, (loop)&update);
     ret = window->open(window);
     delete(window);
     return (ret);

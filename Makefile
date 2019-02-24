@@ -16,7 +16,12 @@ LDFLAGS = -shared
 
 CFLAGS = -fPIC -W -Wall -Wextra -Iinclude/ -g3
 
-CLASS = window.c
+
+DRAWABLE = drawable.c	\
+		point.c
+
+CLASS = window.c	\
+	$(addprefix drawable/, $(DRAWABLE))
 
 MODULAR = new.c
 
@@ -33,13 +38,15 @@ $(NAME): $(OBJ)
 
 clean:
 	rm -f $(OBJ)
+	make -C tests/ clean
 
 fclean: clean
 	rm -f $(NAME)
+	make -C tests/ fclean
 
 re: fclean all
 
-test:
+test: $(NAME)
 	make -C tests/
 
 .PHONY: clean fclean re $(NAME) test
