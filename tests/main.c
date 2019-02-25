@@ -12,18 +12,30 @@
 #include "class/mc_window.h"
 #include "modular/new.h"
 #include "class/drawable/point.h"
+#include "class/drawable/line.h"
+#include "class/drawable/cercle.h"
+
 
 int update(mc_window *window)
 {
     static mc_point *point = NULL;
+    static mc_line *line = NULL;
+    static mc_cercle *cercle = NULL;
 
-    if (point == NULL) {
-        point = new(mc_Point, 10, 10);
-    }
-    if (point == NULL) {
-        return (-1);
-    }
+    point = (point == NULL) ? new(mc_Point, 10, 10) : point;
+    line = (line == NULL) ? new(mc_Line, 20, 20, 30, 40) : line;
+    cercle = (cercle == NULL) ? new(mc_Cercle, 20, 20, 30) : cercle;
+
     window->draw(window, (struct mc_drawable *)point);
+    window->draw(window, (struct mc_drawable *)line);
+    window->draw(window, (struct mc_drawable *)cercle);
+    cercle->rad -= 5;
+    window->draw(window, (struct mc_drawable *)cercle);
+    cercle->rad -= 5;
+    window->draw(window, (struct mc_drawable *)cercle);
+    cercle->rad -= 5;
+    window->draw(window, (struct mc_drawable *)cercle);
+    cercle->rad = 20;
     return (0);
 }
 

@@ -6,6 +6,7 @@
 /* // window class */
 /* // */
 
+#include <time.h>
 #include <unistd.h>
 #include <stdarg.h>
 #include "internal/window.h"
@@ -25,6 +26,7 @@ static void windowDtor(
 {
     XUnmapWindow(this->_display, this->_window);
     XDestroyWindow(this->_display, this->_window);
+    XFreePixmap(this->_display, this->_screen);
     free(this->_gc);
     disconnectToServer(this->_display);
 }
@@ -33,6 +35,7 @@ static int start_update(
     mc_windowPr *this)
 {
     int ret = 0;
+    struct timespec ts = {0, 999999999L / 60};
 
     while (1) {
         while (XPending(this->_display)) {
@@ -41,6 +44,7 @@ static int start_update(
                 (this->_event.type == ClientMessage && this->_event.xclient.data.l[0] == (long)this->_delWin))
                 return (ret);
         }
+        nanosleep(&ts, NULL);
         XSetForeground(this->_display, this->_gc, this->_bcColor);
         XFillRectangle(
             this->_display,
@@ -51,6 +55,7 @@ static int start_update(
             this->window.height);
         XSetForeground(this->_display, this->_gc, this->_frColor);
         ret = this->_loop(this);
+        XFlush(this->_display);
     }
     return (ret);
 }
@@ -87,6 +92,11 @@ static int open(
         0,
         &attribute);
     this->_delWin = XInternAtom(this->_display, "WM_DELETE_WINDOW", True);
+    this->_screen = XCreatePixmap(
+        this->_display,
+        this->_window,
+        this->window.width, this->window.height,
+        32);
     this->_gc = XCreateGC(this->_display, this->_window, 0, 0);
     XSetForeground(this->_display, this->_gc, this->_frColor);
     XSetBackground(this->_display, this->_gc, this->_bcColor);
@@ -156,6 +166,7 @@ static mc_windowPr _description = {
     ._bcColor = 0,
     ._frColor = 0,
     ._delWin = 0,
+    ._screen = 0,
 };
 
 Class   *mc_Window = (Class *)&_description;

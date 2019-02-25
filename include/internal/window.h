@@ -24,6 +24,7 @@ typedef struct
     int _bcColor;
     int _frColor;
     Atom _delWin;
+    Pixmap _screen;
 } mc_windowPr;
 
 #endif //_WINDOW_H_

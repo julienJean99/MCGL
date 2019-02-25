@@ -18,7 +18,9 @@ CFLAGS = -fPIC -W -Wall -Wextra -Iinclude/ -g3
 
 
 DRAWABLE = drawable.c	\
-		point.c
+		point.c		\
+		line.c			\
+		cercle.c
 
 CLASS = window.c	\
 	$(addprefix drawable/, $(DRAWABLE))
