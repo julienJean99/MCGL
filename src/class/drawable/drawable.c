@@ -10,9 +10,9 @@
 #include "modular/object.h"
 #include "internal/interface/drawable.h"
 
-static struct mc_drawable _description = {
+static mc_drawable _description = {
     {
-        .__size__ = sizeof(struct mc_drawable),
+        .__size__ = sizeof(mc_drawable),
         .__name__ = "Drawable",
         .__ctor__ = NULL,
         .__dtor__ = NULL,

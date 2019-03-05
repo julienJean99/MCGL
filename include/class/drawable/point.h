@@ -12,7 +12,7 @@
 #include "class/drawable/drawable.h"
 
 typedef struct {
-    struct mc_drawable base;
+    mc_drawable base;
     int x;
     int y;
 } mc_point;

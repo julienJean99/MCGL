@@ -16,25 +16,26 @@
 #include "class/drawable/cercle.h"
 
 
-int update(mc_window *window)
+int update(
+    mc_window *window)
 {
     static mc_point *point = NULL;
     static mc_line *line = NULL;
     static mc_cercle *cercle = NULL;
 
-    point = (point == NULL) ? new(mc_Point, 10, 10) : point;
+    point = (point == NULL) ? new(mc_Point, 100, 100) : point;
     line = (line == NULL) ? new(mc_Line, 20, 20, 30, 40) : line;
     cercle = (cercle == NULL) ? new(mc_Cercle, 20, 20, 30) : cercle;
 
-    window->draw(window, (struct mc_drawable *)point);
-    window->draw(window, (struct mc_drawable *)line);
-    window->draw(window, (struct mc_drawable *)cercle);
+    window->draw(window, point);
+    window->draw(window, line);
+    window->draw(window, cercle);
     cercle->rad -= 5;
-    window->draw(window, (struct mc_drawable *)cercle);
+    window->draw(window, cercle);
     cercle->rad -= 5;
-    window->draw(window, (struct mc_drawable *)cercle);
+    window->draw(window, cercle);
     cercle->rad -= 5;
-    window->draw(window, (struct mc_drawable *)cercle);
+    window->draw(window, cercle);
     cercle->rad = 20;
     return (0);
 }

@@ -23,7 +23,8 @@ please check your DISPLAY env variable");
 }
 
 // disconnect to the Xserver
-char disconnectToServer(Display *display)
+char disconnectToServer(
+    Display *display)
 {
     if (display == NULL || XCloseDisplay(display) == -1){
         raise("Invalide display");

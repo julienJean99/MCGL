@@ -9,9 +9,9 @@
 #include <time.h>
 #include <unistd.h>
 #include <stdarg.h>
+#include "internal/interface/drawable.h"
 #include "internal/window.h"
 #include "internal/server_connection.h"
-#include "internal/interface/drawable.h"
 
 static void windowCtor(
     mc_windowPr *this,
@@ -125,9 +125,10 @@ static void setLoop(
 
 int draw(
     Object *_this,
-    struct mc_drawable *obj)
+    Object *_obj)
 {
     mc_windowPr *this = _this;
+    mc_drawable *obj = _obj;
 
     if (obj->_usrDraw) {
         return (obj->_usrDraw(obj, (mc_window *)this));

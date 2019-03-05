@@ -22,4 +22,8 @@ struct mc_drawable {
     int (*_draw)(Object *, Display *, Drawable *, GC *);
 };
 
+typedef struct mc_drawable mc_drawable;
+
+extern Class *mc_Drawable;
+
 #endif //_DRAWABLE_H_

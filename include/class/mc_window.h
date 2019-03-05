@@ -11,9 +11,9 @@
 
 # include "modular/object.h"
 
-typedef int (*loop)(Object *);
-
 struct mc_drawable;
+
+typedef int (*loop)(Object *);
 
 typedef struct
 {
@@ -24,7 +24,7 @@ typedef struct
     /* Set the function to call on update */
     void (*setLoop)(Object *, loop func);
     /* draws a drawabel on the window */
-    int (*draw)(Object *, struct mc_drawable *);
+    int (*draw)(Object *, Object *);
     unsigned int width;
     unsigned int height;
 } mc_window;
