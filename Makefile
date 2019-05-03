@@ -6,49 +6,49 @@
 # // Makefile
 # //
 
-OBJ = $(SRC:.c=.o)
-
 CC = gcc
 
-NAME = libMcgl.so
+CFLAGS = -fPIC -W -Wall -Wextra
+
+CPP = $(CC)
+
+CPPFLAGS = -Iinclude/
+
+LD = $(CC)
+
+LDLIBS = -lX11 -lpng
 
 LDFLAGS = -shared
 
-CFLAGS = -fPIC -W -Wall -Wextra -Iinclude/ -g3
-
+NAME = libMcgl.so
 
 DRAWABLE = drawable.c	\
 		point.c		\
 		line.c			\
-		cercle.c
+		cercle.c		\
+		text.c			\
+		image.c
 
 CLASS = window.c	\
 	$(addprefix drawable/, $(DRAWABLE))
 
-MODULAR = new.c
-
 INTERNAL = connect_to_server.c
 
-SRC = $(addprefix src/modular/, $(MODULAR))	\
+MODULAR = new.c
+
+PNG = openPng.c
+
+IMAGE = $(addprefix png/, $(PNG))
+
+SRC := $(addprefix src/modular/, $(MODULAR))	\
 	$(addprefix src/class/, $(CLASS))			\
-	$(addprefix src/internal/, $(INTERNAL))
+	$(addprefix src/internal/, $(INTERNAL))	\
+	$(addprefix src/image/, $(IMAGE))
 
-all: $(NAME)
+OBJ_DIR = obj
 
-$(NAME): $(OBJ)
-	$(CC) -o $(NAME) $(OBJ) $(LDFLAGS)
+override OBJ = $(SRC:%.c=$(OBJ_DIR)/%.o)
 
-clean:
-	rm -f $(OBJ)
-	make -C tests/ clean
+include rules.mk
 
-fclean: clean
-	rm -f $(NAME)
-	make -C tests/ fclean
-
-re: fclean all
-
-test: $(NAME)
-	make -C tests/
-
-.PHONY: clean fclean re $(NAME) test
+.PHONY: all clean fclean re test

@@ -9,26 +9,32 @@
 #include <X11/Xlib.h>
 #include "modular/raise.h"
 
+Display *display = NULL;
+
 // connect to the Xserver
-Display *connectToServer(void)
+__attribute__((constructor)) static void connectToServer(void)
 {
-    Display *display = XOpenDisplay(NULL);
+    display = XOpenDisplay(NULL);
 
     if (display == NULL){
         raise("A Problem acured while connecting to the server X\
 please check your DISPLAY env variable");
-        return (NULL);
+    }
+}
+
+// return the display
+Display *getDisplay(void)
+{
+    if (!display) {
+        connectToServer();
     }
     return (display);
 }
 
 // disconnect to the Xserver
-char disconnectToServer(
-    Display *display)
+__attribute__((destructor))static void disconnectToServer(void)
 {
-    if (display == NULL || XCloseDisplay(display) == -1){
+    if (display == NULL || XCloseDisplay(display) == -1) {
         raise("Invalide display");
-        return (-1);
     }
-    return (0);
 }

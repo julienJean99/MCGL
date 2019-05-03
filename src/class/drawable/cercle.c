@@ -8,6 +8,7 @@
 
 #include <stdarg.h>
 #include <X11/Xlib.h>
+#include "internal/server_connection.h"
 #include "internal/interface/drawable.h"
 #include "class/drawable/cercle.h"
 
@@ -15,23 +16,37 @@ void cercleCtor(
     mc_cercle *this,
     va_list *list)
 {
+    Display *dys = getDisplay();
+    int scr = XDefaultScreen(dys);
+    Window win= XDefaultRootWindow(dys);
+
     this->x = va_arg(*list, int);
     this->y = va_arg(*list, int);
     this->rad = va_arg(*list, int);
+    this->base._gc = XCreateGC(
+        dys,
+        win,
+        0,
+        NULL);
+    XSetForeground(
+        dys,
+        this->base._gc,
+        WhitePixel(
+            dys,
+            scr));
 }
 
 int drawCercle(
     Object *_this,
     Display *display,
-    Drawable *screen,
-    GC *gc)
+    Drawable *screen)
 {
     mc_cercle *this = _this;
 
     return (XDrawArc(
                 display,
                 *screen,
-                *gc,
+                this->base._gc,
                 this->x - this->rad, this->y - this->rad,
                 this->rad * 2, this->rad * 2,
                 0, 360 * 64));
@@ -53,7 +68,7 @@ static mc_cercle _description = {
             .__lt__ = NULL,
         },
      .setDrawFunc = NULL,
-
+     ._gc = NULL,
      ._usrDraw = NULL,
      ._draw = &drawCercle,
     },

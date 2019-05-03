@@ -1,0 +1,22 @@
+/* // */
+/* // This document created by Julien JEAN */
+/* // For project : CMGL */
+/* // */
+/* // Tue  5 Mar 19:16:09 CET 2019 */
+/* // private text */
+/* // */
+
+#ifndef _TEXTPR_H_
+#define _TEXTPR_H_
+
+#include "class/drawable/text.h"
+
+typedef struct {
+    mc_text _text;
+    XTextItem text;
+    GC _gc;
+    int _x;
+    int _y;
+} mc_textPr;
+
+#endif //_TEXTPR_H_

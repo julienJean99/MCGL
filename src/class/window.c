@@ -17,18 +17,19 @@ static void windowCtor(
     mc_windowPr *this,
     va_list *args)
 {
-    this->window.height = va_arg(*args, unsigned int);
-    this->window.width = va_arg(*args, unsigned int);
+    this->_height = va_arg(*args, unsigned int);
+    this->_width = va_arg(*args, unsigned int);
 }
 
 static void windowDtor(
     mc_windowPr *this)
 {
-    XUnmapWindow(this->_display, this->_window);
-    XDestroyWindow(this->_display, this->_window);
-    XFreePixmap(this->_display, this->_screen);
+    Display *display = getDisplay();
+
+    XUnmapWindow(display, this->_window);
+    XDestroyWindow(display, this->_window);
+    XFreePixmap(display, this->_screen);
     free(this->_gc);
-    disconnectToServer(this->_display);
 }
 
 static int start_update(
@@ -36,26 +37,27 @@ static int start_update(
 {
     int ret = 0;
     struct timespec ts = {0, 999999999L / 60};
+    Display *display = getDisplay();
 
     while (1) {
-        while (XPending(this->_display)) {
-            XNextEvent(this->_display, &this->_event);
+        while (XPending(display)) {
+            XNextEvent(display, &this->_event);
             if (this->_event.type == DestroyNotify ||
                 (this->_event.type == ClientMessage && this->_event.xclient.data.l[0] == (long)this->_delWin))
                 return (ret);
         }
         nanosleep(&ts, NULL);
-        XSetForeground(this->_display, this->_gc, this->_bcColor);
+        XSetForeground(display, this->_gc, this->_bcColor);
         XFillRectangle(
-            this->_display,
+            display,
             this->_window,
             this->_gc,
             0, 0,
-            this->window.width,
-            this->window.height);
-        XSetForeground(this->_display, this->_gc, this->_frColor);
+            this->_width,
+            this->_height);
+        XSetForeground(display, this->_gc, this->_frColor);
         ret = this->_loop(this);
-        XFlush(this->_display);
+        XFlush(display);
     }
     return (ret);
 }
@@ -68,43 +70,43 @@ static int open(
         PointerMotionMask | ButtonPressMask | ButtonReleaseMask |
         StructureNotifyMask;
     XSetWindowAttributes attribute = {};
+    Display *display = getDisplay();
 
-    this->_display = connectToServer();
-    if (!this->_display){
-        free(this->_display);
+    if (!display){
+        raise("no display");
         return (-1);
     }
     this->_bcColor = BlackPixel(
-        this->_display,
-        DefaultScreen(this->_display));
+        display,
+        DefaultScreen(display));
     this->_frColor =  WhitePixel(
-        this->_display,
-        DefaultScreen(this->_display));
+        display,
+        DefaultScreen(display));
     this->_window = XCreateWindow(
-        this->_display,
-        XDefaultRootWindow(this->_display),
+        display,
+        XDefaultRootWindow(display),
         0, 0,
-        this->window.width, this->window.height,
+        this->_width, this->_height,
         0,
         CopyFromParent,
         CopyFromParent,
         CopyFromParent,
         0,
         &attribute);
-    this->_delWin = XInternAtom(this->_display, "WM_DELETE_WINDOW", True);
+    this->_delWin = XInternAtom(display, "WM_DELETE_WINDOW", True);
     this->_screen = XCreatePixmap(
-        this->_display,
+        display,
         this->_window,
-        this->window.width, this->window.height,
+        this->_width, this->_height,
         32);
-    this->_gc = XCreateGC(this->_display, this->_window, 0, 0);
-    XSetForeground(this->_display, this->_gc, this->_frColor);
-    XSetBackground(this->_display, this->_gc, this->_bcColor);
-    XSelectInput(this->_display, this->_window, eventM);
-    XSetWMProtocols(this->_display, this->_window, &this->_delWin, 1);
-    XMapWindow(this->_display, this->_window);
+    this->_gc = XCreateGC(display, this->_window, 0, 0);
+    XSetForeground(display, this->_gc, this->_frColor);
+    XSetBackground(display, this->_gc, this->_bcColor);
+    XSelectInput(display, this->_window, eventM);
+    XSetWMProtocols(display, this->_window, &this->_delWin, 1);
+    XMapWindow(display, this->_window);
     while (1) {
-        XNextEvent(this->_display, &this->_event);
+        XNextEvent(display, &this->_event);
         if (this->_event.type == MapNotify)
             break;
     }
@@ -129,11 +131,12 @@ int draw(
 {
     mc_windowPr *this = _this;
     mc_drawable *obj = _obj;
+    Display *display = getDisplay();
 
     if (obj->_usrDraw) {
         return (obj->_usrDraw(obj, (mc_window *)this));
     } else if (obj->_draw) {
-        return (obj->_draw(obj, this->_display, &this->_window, &this->_gc));
+        return (obj->_draw(obj, display, &this->_window));
     }
     return (-1);
 }
@@ -156,13 +159,12 @@ static mc_windowPr _description = {
      .open = &open,
      .setLoop = &setLoop,
      .draw = &draw,
-     .width = 0,
-     .height = 0,
     },
+    ._width = 0,
+    ._height = 0,
     ._event = {},
     ._window = 0,
     ._gc = 0,
-    ._display = NULL,
     ._loop = NULL,
     ._bcColor = 0,
     ._frColor = 0,

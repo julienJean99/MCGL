@@ -14,9 +14,9 @@
 
 struct mc_drawable {
     Class base;
-    /* set the function when drawing the object */
+    /*! set the function to call when drawing the object */
     void (*setDrawFunc)(Object *, drawFunc *);
-    char pad[16];
+    char pad[24];
 };
 
 

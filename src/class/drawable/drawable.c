@@ -26,7 +26,7 @@ static mc_drawable _description = {
         .__lt__ = NULL,
     },
     .setDrawFunc = NULL,
-
+    ._gc = 0,
     ._usrDraw = NULL,
     ._draw = NULL,
 };

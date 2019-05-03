@@ -8,6 +8,7 @@
 
 #include <X11/Xlib.h>
 #include <stdarg.h>
+#include "internal/server_connection.h"
 #include "internal/interface/drawable.h"
 #include "class/drawable/line.h"
 
@@ -15,24 +16,38 @@ void lineCtor(
     mc_line *this,
     va_list *list)
 {
+    Display *dys = getDisplay();
+    int scr = XDefaultScreen(dys);
+    Window win= XDefaultRootWindow(dys);
+
     this->ax = va_arg(*list, int);
     this->ay = va_arg(*list, int);
     this->bx = va_arg(*list, int);
     this->by = va_arg(*list, int);
+    this->base._gc = XCreateGC(
+        dys,
+        win,
+        0,
+        NULL);
+    XSetForeground(
+        dys,
+        this->base._gc,
+        WhitePixel(
+            dys,
+            scr));
 }
 
 int drawLine(
     Object *_this,
     Display *display,
-    Drawable *screen,
-    GC *gc)
+    Drawable *screen)
 {
     mc_line *this = _this;
 
     return (XDrawLine(
                 display,
                 *screen,
-                *gc,
+                this->base._gc,
                 this->ax, this->ay,
                 this->bx, this->by));
 }
@@ -53,9 +68,9 @@ static mc_line _description = {
             .__lt__ = NULL,
         },
      .setDrawFunc = NULL,
-
      ._usrDraw = NULL,
      ._draw = &drawLine,
+     ._gc = 0,
     },
     .ax = 0,
     .ay = 0,

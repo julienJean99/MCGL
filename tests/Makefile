@@ -8,39 +8,24 @@
 
 ROOT = ../
 
-INCLUDE = -I$(ROOT)include/
+CC = clang
 
-SRC_BASE = $(ROOT)src
+LD = clang
+
+CPPFLAGS = -I$(ROOT)include/
+
+CFLAGS = -W -Wall -Wextra -g
+
+LDLIBS = -lMcgl
+
+LDFLAGS = -L..
 
 SRC = main.c
 
 OBJ = $(SRC:.c=.o)
 
-CC = clang
+NAME = test
 
-NAME = functional_test
-
-LDFLAGS = -L.. -lMcgl -lX11 $(INCLUDE)
-
-CFLAGS = -W -Wall -Wextra $(INCLUDE) -g
-
-all: $(NAME)
-
-$(NAME): $(OBJ)
-	$(CC) -o $(NAME) $(OBJ) $(LDFLAGS)
-	mv $(NAME) $(ROOT)
-
-clean:
-	find $(ROOT) -name "*.gcda" -delete
-	find $(ROOT) -name "*.gcno" -delete
-	rm -f $(OBJ)
-
-fclean: clean
-	rm -f $(ROOT)$(NAME)
-
-re: fclean all
-
-test:
-	make -C tests/
+include rules.mk
 
 .PHONY: clean fclean re $(NAME) test

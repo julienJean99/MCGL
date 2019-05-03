@@ -19,7 +19,8 @@ struct mc_drawable {
     /* private */
 
     drawFunc _usrDraw;
-    int (*_draw)(Object *, Display *, Drawable *, GC *);
+    int (*_draw)(Object *, Display *, Drawable *);
+    GC _gc;
 };
 
 typedef struct mc_drawable mc_drawable;

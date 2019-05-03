@@ -11,12 +11,7 @@
 
 #include <X11/Xlib.h>
 
-/* connect_to_server.c */
-
-// connect to the Xserver
-Display *connectToServer(void);
-
-// disconnect to the Xserver
-char disconnectToServer(Display *);
+/* getDisplay */
+Display *getDisplay(void);
 
 #endif //_SERVER_CONNECTION_H_

@@ -19,14 +19,12 @@ typedef struct
 {
     Class base;
 
-    /* Call the function at every update */
+    /*! Call the function at every update */
     int (*open)(Object *);
-    /* Set the function to call on update */
+    /*! Set the function to call on update */
     void (*setLoop)(Object *, loop func);
-    /* draws a drawabel on the window */
+    /*! draws a drawabel on the window */
     int (*draw)(Object *, Object *);
-    unsigned int width;
-    unsigned int height;
 } mc_window;
 
 extern Class *mc_Window;

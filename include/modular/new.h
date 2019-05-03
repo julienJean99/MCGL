@@ -13,11 +13,11 @@
 # include <stdarg.h>
 # include "object.h"
 
-/* Create an object CLASS using parameters */
+/*! Create an object CLASS using parameters */
 Object  *new(Class *class, ...);
-/* Create an object CLASS using a VA_LIST */
+/*! Create an object CLASS using a VA_LIST */
 Object  *va_new(Class *class, va_list* ap);
-/* Call the destructor if not NULL and free the pointer */
+/*! Call the destructor if not NULL and free the pointer */
 void    delete(Object *ptr);
 
 #endif

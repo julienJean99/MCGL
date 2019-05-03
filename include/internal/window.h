@@ -16,10 +16,11 @@
 typedef struct
 {
     mc_window window;
+    unsigned int _width;
+    unsigned int _height;
     XEvent _event;
     Window _window;
     GC _gc;
-    Display *_display;
     loop _loop;
     int _bcColor;
     int _frColor;

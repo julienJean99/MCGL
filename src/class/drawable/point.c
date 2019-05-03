@@ -9,6 +9,7 @@
 #include <stdarg.h>
 #include <X11/Xlib.h>
 #include <string.h>
+#include "internal/server_connection.h"
 #include "internal/interface/drawable.h"
 #include "internal/window.h"
 #include "class/drawable/point.h"
@@ -18,18 +19,35 @@ void pointCtor(
     mc_point *this,
     va_list *list)
 {
+    Display *dys = getDisplay();
+    int scr = XDefaultScreen(dys);
+    Window win= XDefaultRootWindow(dys);
+
     this->x = va_arg(*list, int);
     this->y = va_arg(*list, int);
+    this->base._gc = XCreateGC(
+        dys,
+        win,
+        0,
+        NULL);
+    XSetForeground(
+        dys,
+        this->base._gc,
+        WhitePixel(
+            dys,
+            scr));
 }
 
 int drawPoint(
     Object *_this,
     Display *dys,
-    Drawable *screen,
-    GC *gcon)
+    Drawable *screen)
 {
     mc_point *this = _this;
-    XDrawPoint(dys, *screen, *gcon, this->x, this->y);
+    XDrawPoint(dys,
+               *screen,
+               this->base._gc,
+               this->x, this->y);
     return (0);
 }
 
@@ -96,7 +114,7 @@ static mc_point _description = {
             .__lt__ = NULL,
         },
      .setDrawFunc = NULL,
-
+     ._gc = NULL,
      ._usrDraw = NULL,
      ._draw = &drawPoint,
     },
