@@ -8,7 +8,7 @@
 
 #include <string.h>
 #include "modular/new.h"
-#include "modular/private/listPr.h"
+#include "internal/modular/listPr.h"
 
 static void listCtor(
     list_pr *this,

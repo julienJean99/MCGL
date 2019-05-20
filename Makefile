@@ -22,31 +22,9 @@ LDFLAGS = -shared
 
 NAME = libMcgl.so
 
-DRAWABLE = drawable.c	\
-		point.c		\
-		line.c			\
-		cercle.c		\
-		text.c			\
-		image.c
-
-CLASS = window.c	\
-	$(addprefix drawable/, $(DRAWABLE))
-
-INTERNAL = connect_to_server.c
-
-MODULAR = new.c	\
-		list.c
-
-PNG = openPng.c
-
-IMAGE = $(addprefix png/, $(PNG))
-
-SRC := $(addprefix src/modular/, $(MODULAR))	\
-	$(addprefix src/class/, $(CLASS))			\
-	$(addprefix src/internal/, $(INTERNAL))	\
-	$(addprefix src/image/, $(IMAGE))
-
 OBJ_DIR = obj
+
+include source.mk
 
 override OBJ = $(SRC:%.c=$(OBJ_DIR)/%.o)
 

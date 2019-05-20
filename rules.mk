@@ -32,6 +32,9 @@ fclean: clean
 
 re: fclean all
 
+doc:
+	doxygen MCGL
+
 test: CFLAGS += -g3
 test: $(NAME)
 	make -C tests/
