@@ -16,29 +16,33 @@
 #include "class/drawable/cercle.h"
 #include "class/drawable/text.h"
 #include "class/drawable/image.h"
+#include "modular/list.h"
+
+void *drawList(
+    Drawable *obj,
+    va_list *arg)
+{
+    mc_window *window = va_arg(*arg, mc_window*);
+    window->draw(window, obj);
+    return (NULL);
+}
 
 int update(
     mc_window *window)
 {
-    static mc_point *point = NULL;
-    static mc_line *line = NULL;
-    static mc_cercle *cercle = NULL;
-    static mc_text *text = NULL;
-    static mc_image *image = NULL;
+    static list_t *drawbleList = NULL;
 
-    point = (point == NULL) ? new(mc_Point, 100, 100) : point;
-    line = (line == NULL) ? new(mc_Line, 20, 20, 30, 40) : line;
-    cercle = (cercle == NULL) ? new(mc_Cercle, 20, 20, 30) : cercle;
-    text = (text == NULL) ? new(mc_Text, "Test", "-*-fixed-*-*-*-20-*") : text;
-    image = (image == NULL) ? new(mc_Image,
-                                  "tests/asset/iconfinder_firefox_png_148659.png",
-                                  10, 10) : image;
-
-    window->draw(window, point);
-    window->draw(window, line);
-    window->draw(window, cercle);
-    window->draw(window, text);
-    window->draw(window, image);
+    if (!drawbleList) {
+        drawbleList = new(List_t, 5, 5,
+                          new(mc_Point, 100, 100),
+                          new(mc_Line, 20, 20, 30, 40),
+                          new(mc_Cercle, 20, 20, 30),
+                          new(mc_Text, "Test", "-*-fixed-*-*-*-20-*"),
+                          new(mc_Image,
+                              "tests/asset/iconfinder_firefox_png_148659.png",
+                              150, 350));
+    }
+    delete(drawbleList->map(drawbleList, (mapFunc*)&drawList, window));
     return (0);
 }
 

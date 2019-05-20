@@ -53,7 +53,9 @@ Object *va_new(
 void delete(
     Object *ptr)
 {
-    if (((Class *)ptr)->__dtor__) {
+    if (!ptr) {
+        return;
+    } else if (((Class *)ptr)->__dtor__) {
         ((Class *)ptr)->__dtor__(ptr);
     }
     free(ptr);

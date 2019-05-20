@@ -84,12 +84,6 @@ static char parsePng(
                rowBytes);
         ++index;
     }
-    printf("PNG %d * %d\n rowbytes %d\n depth %d\ncolor type %d\n",
-           width,
-           height,
-           rowBytes,
-           bitDepth,
-           colorType);
     image->image = XCreateImage(
         dys,
         CopyFromParent,
@@ -103,7 +97,6 @@ static char parsePng(
         height,
         bitDepth,
         rowBytes);
-    printf("Image ptr %p\n", image->image);
     png_destroy_info_struct(pngPtr, &pngInfo);
     png_destroy_read_struct(&pngPtr, &pngInfo, NULL);
     return (1);
@@ -123,7 +116,6 @@ char readPng(
     res = parsePng(
         fd,
         image);
-    printf("Res was %d\n", res);
     fclose(fd);
     return (res);
 }
