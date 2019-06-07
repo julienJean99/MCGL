@@ -12,6 +12,7 @@
 #include "internal/interface/drawable.h"
 #include "internal/window.h"
 #include "internal/server_connection.h"
+#include "modular/new.h"
 
 static void windowCtor(
     mc_windowPr *this,
@@ -19,6 +20,7 @@ static void windowCtor(
 {
     this->_height = va_arg(*args, unsigned int);
     this->_width = va_arg(*args, unsigned int);
+    this->_drawMut = new(Mutex_t, NULL);
 }
 
 static void windowDtor(
@@ -29,6 +31,7 @@ static void windowDtor(
     XUnmapWindow(display, this->_window);
     XDestroyWindow(display, this->_window);
     XFreePixmap(display, this->_screen);
+    delete(this->_drawMut);
     free(this->_gc);
 }
 
@@ -127,34 +130,37 @@ static void setLoop(
 
 int draw(
     Object *_this,
-    Object *_obj)
+    const Object *_obj)
 {
     mc_windowPr *this = _this;
-    mc_drawable *obj = _obj;
+    const mc_drawable *obj = _obj;
     Display *display = getDisplay();
+    int tmp = 0;
 
+    this->_drawMut->lock(this->_drawMut);
     if (obj->_usrDraw) {
-        return (obj->_usrDraw(obj, (mc_window *)this));
+        tmp = obj->_usrDraw(obj, (mc_window *)this);
     } else if (obj->_draw) {
-        return (obj->_draw(obj, display, &this->_window));
+        tmp = obj->_draw(obj, display, &this->_window);
     }
-    return (-1);
+    this->_drawMut->unlock(this->_drawMut);
+    return (tmp);
 }
 
 static mc_windowPr _description = {
     {{
-        .__size__ = sizeof(mc_windowPr),
-        .__name__ = "Window",
-        .__ctor__ = (ctor_t)&windowCtor,
-        .__dtor__ = (dtor_t)&windowDtor,
-        .__str__ = NULL,
-        .__add__ = NULL,
-        .__sub__ = NULL,
-        .__mul__ = NULL,
-        .__div__ = NULL,
-        .__eq__ = NULL,
-        .__gt__ = NULL,
-        .__lt__ = NULL,
+            .__size__ = sizeof(mc_windowPr),
+            .__name__ = "Window",
+            .__ctor__ = (ctor_t)&windowCtor,
+            .__dtor__ = (dtor_t)&windowDtor,
+            .__str__ = NULL,
+            .__add__ = NULL,
+            .__sub__ = NULL,
+            .__mul__ = NULL,
+            .__div__ = NULL,
+            .__eq__ = NULL,
+            .__gt__ = NULL,
+            .__lt__ = NULL,
         },
      .open = &open,
      .setLoop = &setLoop,

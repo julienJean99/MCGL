@@ -19,7 +19,11 @@ CLASS = window.c	\
 INTERNAL = connect_to_server.c
 
 MODULAR = new.c	\
-		list.c
+		list.c		\
+		string.c	\
+		map.c		\
+		thread.c	\
+		mutex.c
 
 PNG = openPng.c
 

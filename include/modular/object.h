@@ -14,10 +14,12 @@
 # include <stdbool.h>
 # include "raise.h"
 
+typedef struct string string;
+
 typedef void Object;
 typedef void (*ctor_t)(Object *this, va_list *args);
 typedef void (*dtor_t)(Object *this);
-typedef const char *(*to_string_t)(Object *this);
+typedef const struct string *(*to_string_t)(Object *this);
 typedef Object *(*operator_t)(const Object *this, const Object *other);
 typedef bool (*comparator_t)(const Object *this, const Object *other);
 
@@ -36,7 +38,9 @@ typedef struct {
     comparator_t __lt__;
 } Class;
 
-# define str(o)    (((Class *)o)->__str__ != NULL ? ((Class *)o)->__str__(o) : ((Class *)o)->__name__)
+/*! Create an object CLASS using parameters */
+Object  *new(Class *class, ...);
+
 # define add(a, b) (Class *)a)->__add__(a, b)
 # define sub(a, b) ((Class *)a)->__sub__(a, b)
 # define mul(a, b) ((Class *)a)->__mul__(a, b)

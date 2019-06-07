@@ -49,11 +49,11 @@ static void imageDtor(
 }
 
 static int drawImage(
-    Object *_this,
+    const Object *_this,
     Display *display,
     Drawable *window)
 {
-    mc_imagePr *this = _this;
+    const mc_imagePr *this = _this;
 
     if (!this->image)
         return -1;

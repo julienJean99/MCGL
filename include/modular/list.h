@@ -13,21 +13,32 @@
 
 typedef struct list_t list_t;
 
-/* type for fuction exeutable by map */
-typedef void *(mapFunc)(void *, va_list *);
+typedef struct {
+    const Class *obj;
+    va_list args;
+    size_t index;
+} listArgs;
+
+/*! type for fuction exeutable by map */
+typedef void *(mapFunc)(listArgs *);
+/*! type for fuction exeutable by loop */
+typedef void (loopFunc)(listArgs *);
 
 struct list_t {
     Class base;
     /*! add the element at the end of the list */
-    char (*pushBack)(void *this, void *);
+    bool (*pushBack)(list_t *this, Class *);
     /*! return the length of the list */
-    size_t (*length)(const Object *this);
+    size_t (*length)(const list_t *this);
     /*! remove item at index and return it */
-    void *(*remove)(Object *this, size_t);
+    Class *(*remove)(list_t *this, size_t);
     /*! return the item at index */
-    void *(*at)(const Object *this, size_t);
+    Class *(*at)(const list_t *this, size_t);
+    /*! run a function on every item in the list
+        return a list of each pointer return by mapFunc*/
+    struct list_t *(*map)(const list_t *this, mapFunc *, ...);
     /*! run a function on every item in the list */
-    struct list_t *(*map)(const Object *this, mapFunc *, ...);
+    void (*loop)(const list_t *this, loopFunc *, ...);
 };
 
 extern Class *List_t;

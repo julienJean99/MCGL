@@ -24,11 +24,11 @@ typedef struct
     /*! Set the function to call on update */
     void (*setLoop)(Object *, loop func);
     /*! draws a drawabel on the window */
-    int (*draw)(Object *, Object *);
+    int (*draw)(Object *, const Object *);
 } mc_window;
 
 extern Class *mc_Window;
 
-typedef int (*drawFunc)(Object *, mc_window *);
+typedef int (*drawFunc)(const Object *, mc_window *);
 
 #endif //_WINDOW_H_

@@ -7,24 +7,25 @@
 /* // test */
 /* // */
 
+#include <pthread.h>
 #include <unistd.h>
 #include <stdio.h>
-#include "class/mc_window.h"
 #include "modular/new.h"
+#include "modular/list.h"
+#include "modular/string.h"
+#include "class/mc_window.h"
 #include "class/drawable/point.h"
 #include "class/drawable/line.h"
 #include "class/drawable/cercle.h"
 #include "class/drawable/text.h"
 #include "class/drawable/image.h"
-#include "modular/list.h"
 
-void *drawList(
-    Drawable *obj,
-    va_list *arg)
+void drawList(
+    listArgs *arg)
 {
-    mc_window *window = va_arg(*arg, mc_window*);
-    window->draw(window, obj);
-    return (NULL);
+    mc_window *window = va_arg(arg->args, mc_window*);
+
+    window->draw(window, arg->obj);
 }
 
 int update(
@@ -37,12 +38,12 @@ int update(
                           new(mc_Point, 100, 100),
                           new(mc_Line, 20, 20, 30, 40),
                           new(mc_Cercle, 20, 20, 30),
-                          new(mc_Text, "Test", "-*-fixed-*-*-*-20-*"),
+                          new(mc_Text, "Test", "-*-fixed-*-*-*-10-*"),
                           new(mc_Image,
                               "tests/asset/iconfinder_firefox_png_148659.png",
                               150, 350));
     }
-    delete(drawbleList->map(drawbleList, (mapFunc*)&drawList, window));
+    drawbleList->loop(drawbleList, &drawList, window);
     return (0);
 }
 

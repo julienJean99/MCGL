@@ -19,7 +19,7 @@ struct mc_drawable {
     /* private */
 
     drawFunc _usrDraw;
-    int (*_draw)(Object *, Display *, Drawable *);
+    int (*_draw)(const Object *, Display *, Drawable *);
     GC _gc;
 };
 

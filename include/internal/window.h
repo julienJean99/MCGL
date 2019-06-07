@@ -12,6 +12,7 @@
 # include <X11/Xlib.h>
 # include <X11/Xatom.h>
 # include "class/mc_window.h"
+# include "modular/mutex.h"
 
 typedef struct
 {
@@ -26,6 +27,7 @@ typedef struct
     int _frColor;
     Atom _delWin;
     Pixmap _screen;
+    mutex_t *_drawMut;
 } mc_windowPr;
 
 #endif //_WINDOW_H_

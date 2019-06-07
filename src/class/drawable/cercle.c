@@ -37,11 +37,11 @@ void cercleCtor(
 }
 
 int drawCercle(
-    Object *_this,
+    const Object *_this,
     Display *display,
     Drawable *screen)
 {
-    mc_cercle *this = _this;
+    const mc_cercle *this = _this;
 
     return (XDrawArc(
                 display,

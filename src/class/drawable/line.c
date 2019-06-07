@@ -38,11 +38,11 @@ void lineCtor(
 }
 
 int drawLine(
-    Object *_this,
+    const Object *_this,
     Display *display,
     Drawable *screen)
 {
-    mc_line *this = _this;
+    const mc_line *this = _this;
 
     return (XDrawLine(
                 display,
@@ -55,7 +55,7 @@ int drawLine(
 static mc_line _description = {
     {{
             .__size__ = sizeof(mc_line),
-            .__name__ = "Point",
+            .__name__ = "Line",
             .__ctor__ = (ctor_t)&lineCtor,
             .__dtor__ = NULL,
             .__str__ = NULL,

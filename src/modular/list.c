@@ -8,6 +8,7 @@
 
 #include <string.h>
 #include "modular/new.h"
+#include "modular/thread.h"
 #include "internal/modular/listPr.h"
 
 static void listCtor(
@@ -26,7 +27,7 @@ static void listCtor(
     this->_tab = memset(this->_tab, 0, sizeof(void *) * this->_lenMax);
     while (nb_args) {
         --nb_args;
-        this->base.pushBack(this, va_arg(*args, void *));
+        this->base.pushBack((list_t *)this, va_arg(*args, void *));
     }
 }
 
@@ -48,17 +49,18 @@ static list_t *listAdd(
     const list_pr *this = (const list_pr *)_this;
     const list_pr *other = (const list_pr *)_other;
     list_pr *ret = new(List_t, other->_len + this->_len, 0);
+
     memcpy(ret->_tab, this->_tab, sizeof(void *) * this->_len);
     memcpy(&ret->_tab[this->_len], other->_tab, sizeof(void *) * other->_len);
     ret->_len = this->_len + other->_len;
     return ((list_t *)ret);
 }
 
-static char pushBack(
-    void *_this,
-    Object *object)
+static bool pushBack(
+    list_t *_this,
+    Class *object)
 {
-    list_pr *this = _this;
+    list_pr *this = (list_pr *)_this;
     void *ptr = NULL;
 
     if (this->_len == this->_lenMax) {
@@ -77,18 +79,18 @@ static char pushBack(
 }
 
 static size_t length(
-    const void *_this)
+    const list_t *_this)
 {
-    const list_pr *this = _this;
+    const list_pr *this = (list_pr *)_this;
 
     return this->_len;
 }
 
-static void *at(
-    const Object *_this,
+static Class *at(
+    const list_t *_this,
     size_t idx)
 {
-    const list_pr *this = _this;
+    const list_pr *this = (list_pr *)_this;
 
     if (this->_len < (idx + 1)) {
         raise("index out of bound");
@@ -96,11 +98,11 @@ static void *at(
     return (this->_tab[idx]);
 }
 
-static void *listRemove(
-    Object *_this,
+static Class *listRemove(
+    list_t *_this,
     size_t idx)
 {
-    list_pr *this = _this;
+    list_pr *this = (list_pr *)_this;
     void *ptr = NULL;
 
     if (this->_len < (idx + 1)) {
@@ -112,28 +114,81 @@ static void *listRemove(
 }
 
 static list_t *map(
-    const Object *_this,
+    const list_t *_this,
     mapFunc *func,
     ...)
 {
-    const list_pr *this = _this;
-    va_list args;
-    va_list cp;
+    const list_pr *this = (list_pr *)_this;
     list_pr *ret = new(List_t, this->_len, 0);
+    va_list args;
+    thread *tmp = NULL;
+    list_t *threadList = new(List_t, this->_len, 0);
+    listArgs *argsList = malloc(sizeof(listArgs) * this->_len);
     size_t index = 0;
 
-
-    if (!func || !ret) {
-        return (NULL);
+    if (!func) {
+        return NULL;
     }
     va_start(args, func);
+
+
+    if (!argsList || !threadList) {
+        return (NULL);
+    }
     while (this->_len > index) {
-        va_copy(cp, args);
-        ret->base.pushBack(ret, func(this->_tab[index], &cp));
+        va_copy(argsList[index].args, args);
+        argsList[index].obj = this->_tab[index];
+        argsList[index].index = index;
+        threadList->pushBack(
+            threadList,
+            new(Thread, func, &argsList[index]));
         ++index;
     }
     va_end(args);
+    while (index) {
+        --index;
+        tmp = (thread *)threadList->at(threadList, index);
+        ret->base.pushBack((list_t *)ret, tmp->join(tmp));
+    }
+    delete(threadList);
+    free(argsList);
     return ((list_t *)ret);
+}
+
+static void loop(
+    const list_t *_this,
+    loopFunc *func,
+    ...)
+{
+    const list_pr *this = (list_pr *)_this;
+    va_list args;
+    thread *tmp = NULL;
+    list_t *threadList = new(List_t, this->_len, 0);
+    listArgs *argsList = malloc(sizeof(listArgs) * this->_len);
+    size_t index = 0;
+
+    if (!func || !argsList) {
+        return;
+    }
+    va_start(args, func);
+    while (this->_len > index) {
+        va_copy(argsList[index].args, args);
+        argsList[index].obj = this->_tab[index];
+        argsList[index].index = index;
+        threadList->pushBack(
+            threadList,
+            new(Thread, func, &argsList[index]));
+        ++index;
+    }
+    va_end(args);
+    while (index) {
+        --index;
+        tmp = (thread *)threadList->at(threadList, index);
+        tmp->join(tmp);
+    }
+    delete(threadList);
+    free(argsList);
+    return;
 }
 
 static list_pr _description = {
@@ -156,7 +211,8 @@ static list_pr _description = {
         .length = &length,
         .remove = &listRemove,
         .at = &at,
-        .map = &map
+        .map = &map,
+        .loop = &loop
     },
     ._tab = NULL,
     ._len = 0,

@@ -39,11 +39,11 @@ void pointCtor(
 }
 
 int drawPoint(
-    Object *_this,
+    const Object *_this,
     Display *dys,
     Drawable *screen)
 {
-    mc_point *this = _this;
+    const mc_point *this = _this;
     XDrawPoint(dys,
                *screen,
                this->base._gc,

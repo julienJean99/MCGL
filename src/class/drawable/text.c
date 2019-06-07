@@ -51,17 +51,21 @@ static void textDtor(
 }
 
 static int drawText(
-    Object *_this,
+    const Object *_this,
     Display *display,
     Drawable *screen)
 {
-    mc_textPr *this = _this;
+    const mc_textPr *this = _this;
+    XTextItem _tmp = {.font = this->text.font,
+                      .nchars = this->text.nchars,
+                      .delta = this->text.delta,
+                      .chars = this->text.chars};
 
     XDrawText(display,
               *screen,
               ((mc_drawable *)this)->_gc,
               this->_y, this->_x,
-              &this->text,
+              &_tmp,
               1);
     return (0);
 }

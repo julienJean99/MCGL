@@ -8,7 +8,7 @@
 
 CC = gcc
 
-CFLAGS = -fPIC -W -Wall -Wextra
+CFLAGS = -fPIC -W -Wall -Wextra -pthread
 
 CPP = $(CC)
 
@@ -16,9 +16,9 @@ CPPFLAGS = -Iinclude/
 
 LD = $(CC)
 
-LDLIBS = -lX11 -lpng
+LDLIBS = -lX11 -lpng -lrt
 
-LDFLAGS = -shared
+LDFLAGS = -shared -pthread
 
 NAME = libMcgl.so
 
