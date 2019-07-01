@@ -9,6 +9,7 @@
 #ifndef _TEXTEVENT_H_
 #define _TEXTEVENT_H_
 
+# include "_hook.h"
 # include "modular/object.h"
 
 typedef struct {

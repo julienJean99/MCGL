@@ -10,6 +10,7 @@
 #define _WINDOW_H_
 
 # include "modular/object.h"
+# include "class/event/hook.h"
 
 struct mc_drawable;
 
@@ -18,13 +19,14 @@ typedef int (*loop)(Object *);
 typedef struct
 {
     Class base;
-
     /*! Call the function at every update */
-    int (*open)(Object *);
+    int (*open)(Object *this);
     /*! Set the function to call on update */
-    void (*setLoop)(Object *, loop func);
+    void (*setLoop)(Object *this, loop func);
     /*! draws a drawabel on the window */
-    int (*draw)(Object *, const Object *);
+    int (*draw)(Object *this, const Object *);
+    /*! used to set hooks: see hook.h for more info */
+    void (*setHook)(Object *this, enum eventCategory, ...);
 } mc_window;
 
 extern Class *mc_Window;

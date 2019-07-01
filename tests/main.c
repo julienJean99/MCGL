@@ -19,6 +19,7 @@
 #include "class/drawable/cercle.h"
 #include "class/drawable/text.h"
 #include "class/drawable/image.h"
+#include "class/event/hook.h"
 
 void drawList(
     listArgs *arg)
@@ -26,6 +27,15 @@ void drawList(
     mc_window *window = va_arg(arg->args, mc_window*);
 
     window->draw(window, arg->obj);
+}
+
+void pointerPosition(
+    mc_mouseMouvment *mouvment)
+{
+    mc_cercle *cercle = mouvment->param;
+
+    cercle->x = mouvment->x;
+    cercle->y = mouvment->y;
 }
 
 int update(
@@ -42,6 +52,12 @@ int update(
                           new(mc_Image,
                               "tests/asset/iconfinder_firefox_png_148659.png",
                               150, 350));
+        window->setHook(
+            window,
+            mouse,
+            mouvment,
+            &pointerPosition,
+            drawbleList->at(drawbleList, 2));
     }
     drawbleList->loop(drawbleList, &drawList, window);
     return (0);

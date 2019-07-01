@@ -13,12 +13,14 @@ DRAWABLE = drawable.c	\
 		text.c			\
 		image.c
 
-EVENT = hook.c	\
+EVENT = hook.c		\
+		event.c	\
+		mouseEventHandler.c
 
 
 CLASS = window.c							\
 	$(addprefix drawable/, $(DRAWABLE))	\
-	$(addprefix src/event/, $(EVENT))
+	$(addprefix event/, $(EVENT))
 
 INTERNAL = connect_to_server.c
 

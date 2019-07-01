@@ -17,27 +17,28 @@ static void hookCtor(
     this->_arg= va_arg(*args, void *);
 }
 
-static void hookDtor(_mc_hook *this)
-{
-    delete(this->_arg);
-}
-
 static void setFunc(
-    _mc_hook *this,
+    Object *_this,
     hookFunc func)
 {
+    _mc_hook *this = _this;
+
     this->_func = func;
 }
 
 static void setArg(
-    _mc_hook *this,
+    Object *_this,
     Object *arg)
 {
+    _mc_hook *this = _this;
+
     this->_arg = arg;
 }
 
-void *trigger(_mc_hook *this)
+static void *trigger(Object *_this)
 {
+    _mc_hook *this = _this;
+
     if (this->_func) {
         return (this->_func(this->_arg));
     }
@@ -50,7 +51,7 @@ static _mc_hook _description = {
             .__size__ = sizeof(_mc_hook),
             .__name__ = "mc_Hook",
             .__ctor__ = (ctor_t)&hookCtor,
-            .__dtor__ = (dtor_t)&hookDtor,
+            .__dtor__ = NULL,
             .__str__ = NULL,
             .__add__ = NULL,
             .__sub__ = NULL,

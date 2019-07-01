@@ -25,4 +25,29 @@ typedef struct {
 
 extern Class *mc_Hook;
 
+/* Event Hook */
+
+enum eventCategory {
+    mouse,
+    keyBoared,
+    window
+};
+
+/* MOUSE HOOK */
+
+enum mouseEvent {
+    mouvment,
+    clickR,
+    clickL,
+};
+
+/*! parameter given to the mouse moovment hool on trigger */
+typedef struct {
+    int x;
+    int y;
+    Object *param;
+} mc_mouseMouvment;
+
+/*! type for the mouse mouvment */
+typedef void (*MouseMouvmentHook)(mc_mouseMouvment *arg);
 #endif //_HOOK_H_

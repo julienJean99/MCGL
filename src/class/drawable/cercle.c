@@ -55,7 +55,7 @@ int drawCercle(
 static mc_cercle _description = {
     {{
             .__size__ = sizeof(mc_cercle),
-            .__name__ = "Point",
+            .__name__ = "Cercle",
             .__ctor__ = (ctor_t)&cercleCtor,
             .__dtor__ = NULL,
             .__str__ = NULL,

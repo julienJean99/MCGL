@@ -13,6 +13,7 @@
 # include <X11/Xatom.h>
 # include "class/mc_window.h"
 # include "modular/mutex.h"
+# include "internal/event/event.h"
 
 typedef struct
 {
@@ -28,6 +29,7 @@ typedef struct
     Atom _delWin;
     Pixmap _screen;
     mutex_t *_drawMut;
+    _event *_eventHandler;
 } mc_windowPr;
 
 #endif //_WINDOW_H_

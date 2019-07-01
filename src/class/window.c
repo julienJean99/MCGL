@@ -21,6 +21,7 @@ static void windowCtor(
     this->_height = va_arg(*args, unsigned int);
     this->_width = va_arg(*args, unsigned int);
     this->_drawMut = new(Mutex_t, NULL);
+    this->_eventHandler = new(_Event);
 }
 
 static void windowDtor(
@@ -32,6 +33,7 @@ static void windowDtor(
     XDestroyWindow(display, this->_window);
     XFreePixmap(display, this->_screen);
     delete(this->_drawMut);
+    delete(this->_eventHandler);
     free(this->_gc);
 }
 
@@ -49,6 +51,7 @@ static int start_update(
                 (this->_event.type == ClientMessage &&
                  this->_event.xclient.data.l[0] == (long)this->_delWin))
                 return (ret);
+            this->_eventHandler->newEvent(this->_eventHandler, &this->_event);
         }
         nanosleep(&ts, NULL);
         XSetForeground(display, this->_gc, this->_bcColor);
@@ -129,7 +132,7 @@ static void setLoop(
     this->_loop = func;
 }
 
-int draw(
+static int draw(
     Object *_this,
     const Object *_obj)
 {
@@ -146,6 +149,19 @@ int draw(
     }
     this->_drawMut->unlock(this->_drawMut);
     return (tmp);
+}
+
+static void setHook(
+    Object *_this,
+    enum eventCategory category,
+    ...)
+{
+    mc_windowPr *this = _this;
+    va_list ap;
+
+    va_start(ap, category);
+    this->_eventHandler->setHook(this->_eventHandler, category, &ap);
+    va_end(ap);
 }
 
 static mc_windowPr _description = {
@@ -166,6 +182,7 @@ static mc_windowPr _description = {
      .open = &open,
      .setLoop = &setLoop,
      .draw = &draw,
+     .setHook = &setHook
     },
     ._width = 0,
     ._height = 0,
@@ -177,6 +194,8 @@ static mc_windowPr _description = {
     ._frColor = 0,
     ._delWin = 0,
     ._screen = 0,
+    ._drawMut = NULL,
+    ._eventHandler = NULL
 };
 
 Class   *mc_Window = (Class *)&_description;
