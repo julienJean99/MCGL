@@ -13,8 +13,12 @@ DRAWABLE = drawable.c	\
 		text.c			\
 		image.c
 
-CLASS = window.c	\
-	$(addprefix drawable/, $(DRAWABLE))
+EVENT = hook.c	\
+
+
+CLASS = window.c							\
+	$(addprefix drawable/, $(DRAWABLE))	\
+	$(addprefix src/event/, $(EVENT))
 
 INTERNAL = connect_to_server.c
 

@@ -11,7 +11,7 @@
 #include "internal/modular/mapPr.h"
 
 static void mapCtor(
-    map_pr *this,
+    _map_t *this,
     va_list *args)
 {
     size_t max_len = va_arg(*args, size_t);
@@ -19,18 +19,19 @@ static void mapCtor(
 
     this->_mapSize = ((max_len / ALLOCSIZE) * ALLOCSIZE);
     this->_map = malloc(sizeof(void *) * this->_mapSize);
+    this->_map = malloc(sizeof(void *) * this->_mapSize);
     if (!this->_map) {
         raise("out of memory");
     }
     this->_map = memset(this->_map, 0, sizeof(void *) * this->_mapSize);
     while (nb_args) {
         --nb_args;
-        this->base.emplace(this, va_arg(*args, size_t), va_arg(*args, void*));
+        this->base.emplace(this, va_arg(*args, string *), va_arg(*args, void*));
     }
 }
 
 static void mapDtor(
-    map_pr *this,
+    _map_t *this,
     __attribute__((unused))va_list *args)
 {
     while (this->_mapSize) {
@@ -40,81 +41,166 @@ static void mapDtor(
     free(this->_map);
 }
 
+static ssize_t _findIdx(
+    string *objKey,
+    size_t idxLow,
+    size_t idxHigh,
+    const string **keyTab)
+{
+    size_t idxMid = idxLow + (idxHigh - idxLow) * .5;
+
+    if (idxLow == idxHigh) {
+        if (eq(objKey, keyTab[idxLow]))
+            return (idxLow);
+        return (-1);
+    } else if (lt(objKey, keyTab[idxMid])) {
+        return (_findIdx(objKey, idxLow, idxMid, keyTab));
+    } else if (gt(objKey, keyTab[idxMid])) {
+        return (_findIdx(objKey, idxMid, idxHigh, keyTab));
+    }
+    return (-1);
+}
+
 static void *findMap(
     Object *_this,
-    unsigned int key)
+    string *key)
 {
-    map_pr *this = _this;
+    _map_t *this = _this;
+    ssize_t index = _findIdx(key,
+                             0,
+                             this->_mapSize - 1,
+                             (const string **)this->_keyMap);
 
-    if (key >= this->_mapSize) {
+    if (index == -1) {
         return (NULL);
     }
-    return (this->_map[key]);
+    return (this->_map[index]);
 }
 
 static void swapMap(
     Object *_this,
-    unsigned int key1,
-    unsigned int key2)
+    string *key1,
+    string *key2)
 {
-    map_pr *this = _this;
+    _map_t *this = _this;
     void *tmp = NULL;
+    ssize_t idx1 = _findIdx(key1,
+                            0,
+                            this->_mapSize - 1,
+                            (const string **)this->_keyMap);
+    ssize_t idx2 = _findIdx(key2,
+                            0,
+                            this->_mapSize - 1,
+                            (const string **)this->_keyMap);
 
-    if (this->_mapSize <= key1 ||
-        this->_mapSize <= key2 ) {
+    if (idx1 == -1 ||
+        idx2 == -1) {
         return;
     }
-
-    tmp = this->_map[key1];
-    this->_map[key1] = this->_map[key2];
-    this->_map[key2] = tmp;
+    tmp = this->_map[idx1];
+    this->_map[idx1] = this->_map[idx2];
+    this->_map[idx2] = tmp;
     return;
 }
 
-static char emplaceMap(
+static void _shiftMapR(
     Object *_this,
-    unsigned int key,
-    void *object)
+    size_t toFree)
 {
-    map_pr *this = _this;
+    _map_t *this = _this;
+    size_t index = this->_mapSize;
     void *tmp = NULL;
 
-    if (key >= this->_mapSize) {
+    --toFree;
+    while (index != toFree) {
+        --index;
+        tmp = this->_map[index];
+        this->_map[index + 1] = tmp;
+    }
+    ++this->_mapSize;
+}
+
+static size_t _findEmplace(
+    string *objKey,
+    size_t idxLow,
+    size_t idxHigh,
+    const string **keyTab)
+{
+    size_t idxMid = idxLow + (idxHigh - idxLow) * .5;
+
+    if (idxLow == idxHigh) {
+        if (eq(objKey, keyTab[idxLow]))
+            return (idxLow);
+        return (-1);
+    } else if (lt(objKey, keyTab[idxMid])) {
+        return (_findIdx(objKey, idxLow, idxMid, keyTab));
+    } else if (gt(objKey, keyTab[idxMid])) {
+        return (_findIdx(objKey, idxMid, idxHigh, keyTab));
+    }
+    return (-1);
+}
+
+static bool emplaceMap(
+    Object *_this,
+    string *key,
+    void *object)
+{
+    _map_t *this = _this;
+    void *tmp = NULL;
+    ssize_t index = _findIdx(key,
+                             0,
+                             this->_mapSize - 1,
+                             (const string **)this->_keyMap);
+
+    if (index == -1) {
         tmp = realloc(
             this->_map,
             sizeof(void *) * (this->_mapSize + ALLOCSIZE));
         if (!tmp) {
-            raise("Out of memory");
+            return (false);
         }
         this->_map = tmp;
+        index = _findEmplace(key,
+                             0,
+                             this->_mapSize - 1,
+                             (const string **)this->_keyMap);
+        _shiftMapR(this, index);
     }
-    if (this->_map[key]) {
-        delete(this->_map[key]);
+    if (this->_map[index]) {
+        delete(this->_map[index]);
     }
-    this->_map[key] = object;
-    return (1);
+    this->_map[index] = object;
+    return (true);
 }
 
 static void *removeMap(
     Object *_this,
-    unsigned int key)
+    string *key)
 {
-    map_pr *this = _this;
+    _map_t *this = _this;
+    size_t max = this->_mapSize;
+    ssize_t index = _findIdx(key,
+                             0,
+                             this->_mapSize - 1,
+                             (const string **)this->_keyMap);
     void *tmp = NULL;
 
-    if (key >= this->_mapSize) {
+    if (index == -1) {
         return (NULL);
     }
-    tmp = this->_map[key];
-    this->_map[key] = NULL;
+    tmp = this->_map[index];
+    while ((unsigned)index != max) {
+        this->_map[index] = this->_map[index + 1];
+        ++index;
+    }
+    --this->_mapSize;
     return (tmp);
 }
 
-
-static map_pr _description = {
+static _map_t _description = {
     {
         {
-            .__size__ = sizeof(map_pr),
+            .__size__ = sizeof(_map_t),
             .__name__ = "Map_t",
             .__ctor__ = (ctor_t)&mapCtor,
             .__dtor__ = (dtor_t)&mapDtor,
@@ -133,6 +219,7 @@ static map_pr _description = {
         .remove = &removeMap
     },
     ._map = NULL,
+    ._keyMap = NULL,
     ._mapSize = 0
 };
 

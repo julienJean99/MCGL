@@ -16,7 +16,8 @@
 typedef struct {
     map_t base;
     void **_map;
+    string **_keyMap;
     size_t _mapSize;
-} map_pr;
+} _map_t;
 
 #endif //_MAPPR_H_

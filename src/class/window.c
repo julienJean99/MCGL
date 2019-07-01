@@ -46,7 +46,8 @@ static int start_update(
         while (XPending(display)) {
             XNextEvent(display, &this->_event);
             if (this->_event.type == DestroyNotify ||
-                (this->_event.type == ClientMessage && this->_event.xclient.data.l[0] == (long)this->_delWin))
+                (this->_event.type == ClientMessage &&
+                 this->_event.xclient.data.l[0] == (long)this->_delWin))
                 return (ret);
         }
         nanosleep(&ts, NULL);
@@ -59,6 +60,9 @@ static int start_update(
             this->_width,
             this->_height);
         XSetForeground(display, this->_gc, this->_frColor);
+        if (!this->_loop) {
+            return (-1);
+        }
         ret = this->_loop(this);
         XFlush(display);
     }
@@ -113,10 +117,7 @@ static int open(
         if (this->_event.type == MapNotify)
             break;
     }
-    if (this->_loop) {
-        return (start_update(this));
-    }
-    return (-1);
+    return (start_update(this));
 }
 
 static void setLoop(

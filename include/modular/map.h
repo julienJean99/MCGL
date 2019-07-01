@@ -9,20 +9,21 @@
 #ifndef _MAP_H_
 #define _MAP_H_
 
-#include "object.h"
+# include "object.h"
+# include "string.h"
 
 typedef struct {
     Class base;
     /*! return the object represented by KEY.
         if key is not found return NULL */
-    void *(*find)(Object *this, unsigned int);
-    /*! swap the content of to the to key */
-    void (*swap)(Object *this, unsigned int, unsigned int);
+    void *(*find)(Object *this, string *key);
+    /*! swap the content of to the to *key */
+    void (*swap)(Object *this, string *key1, string *key2);
     /*! emplace an object for the key.
         return a boolean signifing the succes */
-    char (*emplace)(Object *this, unsigned int, void *);
+    bool (*emplace)(Object *this, string *key, void *);
     /*! remove the key and return the object*/
-    void *(*remove)(Object *this, unsigned int);
+    void *(*remove)(Object *this, string *key);
 } map_t;
 
 
