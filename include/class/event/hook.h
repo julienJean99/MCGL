@@ -25,6 +25,19 @@ typedef struct {
 
 extern Class *mc_Hook;
 
+#ifndef _KEYSTATE_
+# define _KEYSTATE_
+
+/* for each button you can chouse between 3 state */
+
+enum keyState{
+    press ,
+    hold,
+    release
+};
+
+# endif  /* _KEYSTATE_ */
+
 /* Event Hook */
 
 enum eventCategory {

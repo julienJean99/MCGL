@@ -31,9 +31,15 @@ static void newEvent(
 {
     _event *this = (_event *)_this;
 
-    printf("newEvent %d %d\n", MotionNotify, event->type);
-    if (event->type == MotionNotify) {
+    if (event->type == ButtonPress ||
+        event->type == ButtonRelease) {
+        this->_mouse->buttonEvent(this->_mouse, &event->xbutton);
+    } else if (event->type == MotionNotify) {
         this->_mouse->pointerMouvment(this->_mouse, &event->xmotion);
+    } else if (event->type == KeyPress) {
+        printf("k press\n");
+    } else if (event->type == KeyRelease) {
+        printf("k Release\n");
     }
 }
 

@@ -6,7 +6,6 @@
 /* // window class */
 /* // */
 
-#include <time.h>
 #include <unistd.h>
 #include <stdarg.h>
 #include "internal/interface/drawable.h"
@@ -53,6 +52,8 @@ static int start_update(
                 return (ret);
             this->_eventHandler->newEvent(this->_eventHandler, &this->_event);
         }
+        this->_eventHandler->_mouse->left->frame(this->_eventHandler->_mouse->left);
+        this->_eventHandler->_mouse->right->frame(this->_eventHandler->_mouse->right);
         nanosleep(&ts, NULL);
         XSetForeground(display, this->_gc, this->_bcColor);
         XFillRectangle(

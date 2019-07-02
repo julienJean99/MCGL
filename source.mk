@@ -13,9 +13,10 @@ DRAWABLE = drawable.c	\
 		text.c			\
 		image.c
 
-EVENT = hook.c		\
-		event.c	\
-		mouseEventHandler.c
+EVENT = hook.c					\
+		event.c				\
+		mouseEventHandler.c	\
+		buttonHandler.c
 
 
 CLASS = window.c							\

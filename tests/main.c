@@ -38,6 +38,19 @@ void pointerPosition(
     cercle->y = mouvment->y;
 }
 
+void enlargeCercle(mc_cercle *cercle)
+{
+    cercle->rad += 3;
+}
+
+void reduceCercle(mc_cercle *cercle)
+{
+    cercle->rad -= 3;
+    if (cercle->rad < 0) {
+        cercle->rad = 0;
+    }
+}
+
 int update(
     mc_window *window)
 {
@@ -58,6 +71,35 @@ int update(
             mouvment,
             &pointerPosition,
             drawbleList->at(drawbleList, 2));
+        window->setHook(
+            window,
+            mouse,
+            clickR,
+            press,
+            &reduceCercle,
+            drawbleList->at(drawbleList, 2));
+        window->setHook(
+            window,
+            mouse,
+            clickR,
+            hold,
+            &reduceCercle,
+            drawbleList->at(drawbleList, 2));
+        window->setHook(
+            window,
+            mouse,
+            clickL,
+            press,
+            &enlargeCercle,
+            drawbleList->at(drawbleList, 2));
+        window->setHook(
+            window,
+            mouse,
+            clickL,
+            hold,
+            &enlargeCercle,
+            drawbleList->at(drawbleList, 2));
+
     }
     drawbleList->loop(drawbleList, &drawList, window);
     return (0);

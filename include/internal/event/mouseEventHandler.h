@@ -22,7 +22,7 @@ typedef struct {
     void (*setHook)(Object *this, va_list *args);
     mc_key *left;
     mc_key *right;
-    _mc_hook *mouvment;
+    mc_hook *mouvment;
     mc_mouseMouvment mouveArg;
 } _mouseEventHandler;
 

@@ -10,18 +10,23 @@
 #include "internal/event/mouseEventHandler.h"
 #include "class/event/hook.h"
 #include "modular/new.h"
+#include "internal/event/buttonHandler.h"
 
 static void mouseHandlerCtor(
     _mouseEventHandler *this,
     __attribute__((unused)) va_list *args)
 {
     this->mouvment = new(mc_Hook, NULL, NULL);
+    this->left = new(mc_Key);
+    this->right = new(mc_Key);
 }
 
 static void mouseHandlerDtor(
     _mouseEventHandler *this)
 {
     delete(this->mouvment);
+    delete(this->left);
+    delete(this->right);
 }
 
 static void pointerMouvment(
@@ -34,14 +39,23 @@ static void pointerMouvment(
     printf("mouse mouvment\n");
     arg->x = event->x;
     arg->y = event->y;
-    this->mouvment->base.trigger(this->mouvment);
+    this->mouvment->trigger(this->mouvment);
 }
 
 static void buttonEvent(
-    Object *this,
+    Object *_this,
     XButtonEvent *event)
 {
+    _mouseEventHandler *this = _this;
 
+    printf("button event\n");
+    if (event->button == Button1) {
+        this->left->keyEvent(this->left, (XKeyEvent*)event);
+        printf("button left\n");
+    } else if (event->button == Button3) {
+        this->right->keyEvent(this->right, (XKeyEvent*)event);
+        printf("button left\n");
+    }
 }
 
 static void setHook(
@@ -50,12 +64,32 @@ static void setHook(
 {
     _mouseEventHandler *this = _this;
     int event = va_arg(*args, int);
+    int state = -1;
+    hookFunc func = NULL;
 
-    printf("mouse Handler\n");
+    printf("mouse Handler");
     if (event == mouvment) {
-        this->mouvment->_func = va_arg(*args, hookFunc);
+        this->mouvment->setFunc(this->mouvment, va_arg(*args, hookFunc));
         this->mouveArg.param = va_arg(*args, Object *);
-        this->mouvment->_arg = &this->mouveArg;
+        this->mouvment->setArg(this->mouvment, &this->mouveArg);
+    } else if (event == clickR) {
+        printf("left click\n");
+        state = va_arg(*args, int);
+        func = va_arg(*args, hookFunc);
+        this->right->setHook(this->right,
+                             state,
+                             new(mc_Hook,
+                                 func,
+                                 va_arg(*args, Object *)));
+    } else if (event == clickL) {
+        printf("left click\n");
+        state = va_arg(*args, int);
+        func = va_arg(*args, hookFunc);
+        this->left->setHook(this->left,
+                            state,
+                            new(mc_Hook,
+                                func,
+                                va_arg(*args, Object *)));
     }
 }
 

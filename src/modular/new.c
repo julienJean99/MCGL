@@ -27,9 +27,6 @@ Object *new(
         va_start(ap, class);
         class->__ctor__(ret, &ap);
         va_end(ap);
-    } else {
-        free(ret);
-        return (NULL);
     }
     return (ret);
 }
