@@ -34,9 +34,13 @@ struct list_t {
     Class *(*remove)(list_t *this, size_t);
     /*! return the item at index */
     Class *(*at)(const list_t *this, size_t);
+    /*! set the item at index
+        return the item at index if it exist
+        else return NULL*/
+    Class *(*emplace)(list_t *this, size_t, Class *);
     /*! run a function on every item in the list
         return a list of each pointer return by mapFunc*/
-    struct list_t *(*map)(const list_t *this, mapFunc *, ...);
+    list_t *(*map)(const list_t *this, mapFunc *, ...);
     /*! run a function on every item in the list */
     void (*loop)(const list_t *this, loopFunc *, ...);
 };

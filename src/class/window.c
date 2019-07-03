@@ -12,6 +12,7 @@
 #include "internal/window.h"
 #include "internal/server_connection.h"
 #include "modular/new.h"
+#include "internal/event/event.h"
 
 static void windowCtor(
     mc_windowPr *this,
@@ -39,7 +40,7 @@ static void windowDtor(
 static int start_update(
     mc_windowPr *this)
 {
-    int ret = 0;
+    int ret = -1;
     struct timespec ts = {0, 999999999L / 60};
     Display *display = getDisplay();
 
@@ -50,7 +51,10 @@ static int start_update(
                 (this->_event.type == ClientMessage &&
                  this->_event.xclient.data.l[0] == (long)this->_delWin))
                 return (ret);
-            this->_eventHandler->newEvent(this->_eventHandler, &this->_event);
+            this->_eventHandler->newEvent(
+                this->_eventHandler,
+                this,
+                &this->_event);
         }
         this->_eventHandler->_mouse->left->frame(this->_eventHandler->_mouse->left);
         this->_eventHandler->_mouse->right->frame(this->_eventHandler->_mouse->right);
@@ -65,7 +69,7 @@ static int start_update(
             this->_height);
         XSetForeground(display, this->_gc, this->_frColor);
         if (!this->_loop) {
-            return (-1);
+            return (ret);
         }
         ret = this->_loop(this);
         XFlush(display);
@@ -165,6 +169,14 @@ static void setHook(
     va_end(ap);
 }
 
+static void winClose(
+    Object *_this)
+{
+    mc_windowPr *this = _this;
+
+    this->_loop = NULL;
+}
+
 static mc_windowPr _description = {
     {{
             .__size__ = sizeof(mc_windowPr),
@@ -183,7 +195,8 @@ static mc_windowPr _description = {
      .open = &open,
      .setLoop = &setLoop,
      .draw = &draw,
-     .setHook = &setHook
+     .setHook = &setHook,
+     .close = &winClose,
     },
     ._width = 0,
     ._height = 0,

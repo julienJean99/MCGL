@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 #include "internal/event/mouseEventHandler.h"
-#include "class/event/hook.h"
+#include "event/hook.h"
 #include "modular/new.h"
 #include "internal/event/buttonHandler.h"
 

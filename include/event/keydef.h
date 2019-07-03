@@ -9,8 +9,9 @@
 #ifndef _KEYDEF_H_
 #define _KEYDEF_H_
 
-#include <X11/keysymdef.h>
+#include <X11/keysym.h>
 
+#define mc_any XK_VoidSymbol  /* any key */
 #define mc_space XK_space  /*  SPACE */
 #define mc_exclam XK_exclam  /*  EXCLAMATION MARK */
 #define mc_quotedbl XK_quotedbl  /*  QUOTATION MARK */
@@ -19,7 +20,6 @@
 #define mc_percent XK_percent  /*  PERCENT SIGN */
 #define mc_ampersand XK_ampersand  /*  AMPERSAND */
 #define mc_apostrophe XK_apostrophe  /*  APOSTROPHE */
-#define mc_quoteright XK_quoteright  /* deprecate */
 #define mc_parenleft XK_parenleft  /*  LEFT PARENTHESIS */
 #define mc_parenright XK_parenright  /*  RIGHT PARENTHESIS */
 #define mc_asterisk XK_asterisk  /*  ASTERISK */
@@ -107,5 +107,26 @@
 #define mc_bar XK_bar  /*  VERTICAL LINE */
 #define mc_braceright XK_braceright  /*  RIGHT CURLY BRACKET */
 #define mc_asciitilde XK_asciitilde  /*  TILDE */
+
+
+#define mc_backspace XK_BackSpace  /* Back space, back char */
+#define mc_tab XK_Tab
+#define mc_linefeed XK_Linefeed  /* Linefeed, LF */
+#define mc_return XK_Return  /* Return, enter */
+#define mc_pause XK_Pause  /* Pause, hold */
+#define mc_escape XK_Escape
+#define mc_delete XK_Delete  /* Delete, rubout */
+
+#define mc_home XK_Home
+#define mc_left XK_Left  /* Move left, left arrow */
+#define mc_up XK_Up  /* Move up, up arrow */
+#define mc_right XK_Right  /* Move right, right arrow */
+#define mc_down XK_Down  /* Move down, down arrow */
+#define mc_prior XK_Prior /* Prior, previous */
+#define mc_page_up XK_Page_Up
+#define mc_next XK_Next /* Next */
+#define mc_page_Down XK_Page_Down
+#define mc_end XK_End /* EOL */
+#define mc_begin XK_Begin  /* BOL */
 
 #endif //_KEYDEF_H_

@@ -21,6 +21,7 @@ typedef struct {
     mc_hook *press;
     mc_hook *hold;
     mc_hook *release;
+    Time lastEventC;
     Time lastEvent;
     bool isPress;
 } mc_key;

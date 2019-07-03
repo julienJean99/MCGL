@@ -9,14 +9,15 @@
 #ifndef _EVENT_H_
 #define _EVENT_H_
 
-# include "class/event/hook.h"
+# include "event/hook.h"
 # include "modular/object.h"
 # include "textEventHandler.h"
 # include "mouseEventHandler.h"
+# include "internal/window.h"
 
-typedef struct {
+typedef struct _event {
     Class _base;
-    void (*newEvent)(Object *this, XEvent *event);
+    void (*newEvent)(Object *this, mc_windowPr *, XEvent *);
     void (*setHook)(Object *this, enum eventCategory, va_list *);
     _textEventHandler *_text;
     _mouseEventHandler *_mouse;

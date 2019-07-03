@@ -62,7 +62,7 @@ static int drawImage(
               ((mc_drawable *)this)->_gc,
               this->image,
               0, 0,
-              this->_image.y, this->_image.x,
+              this->_image.x, this->_image.y,
               this->image->width, this->image->height);
     return (0);
 }

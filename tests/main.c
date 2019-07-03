@@ -19,7 +19,8 @@
 #include "class/drawable/cercle.h"
 #include "class/drawable/text.h"
 #include "class/drawable/image.h"
-#include "class/event/hook.h"
+#include "event/hook.h"
+#include "event/keydef.h"
 
 void drawList(
     listArgs *arg)
@@ -40,15 +41,35 @@ void pointerPosition(
 
 void enlargeCercle(mc_cercle *cercle)
 {
-    cercle->rad += 3;
+    cercle->rad += 1;
 }
 
 void reduceCercle(mc_cercle *cercle)
 {
-    cercle->rad -= 3;
+    cercle->rad -= 1;
     if (cercle->rad < 0) {
         cercle->rad = 0;
     }
+}
+
+void imUp(mc_image *image)
+{
+    image->y -= 3;
+}
+
+void imDown(mc_image *image)
+{
+    image->y += 3;
+}
+
+void imLeft(mc_image *image)
+{
+    image->x -= 3;
+}
+
+void imRight(mc_image *image)
+{
+    image->x += 3;
 }
 
 int update(
@@ -63,46 +84,26 @@ int update(
                           new(mc_Cercle, 20, 20, 30),
                           new(mc_Text, "Test", "-*-fixed-*-*-*-10-*"),
                           new(mc_Image,
-                              "tests/asset/iconfinder_firefox_png_148659.png",
-                              150, 350));
-        window->setHook(
-            window,
-            mouse,
-            mouvment,
-            &pointerPosition,
-            drawbleList->at(drawbleList, 2));
-        window->setHook(
-            window,
-            mouse,
-            clickR,
-            press,
-            &reduceCercle,
-            drawbleList->at(drawbleList, 2));
-        window->setHook(
-            window,
-            mouse,
-            clickR,
-            hold,
-            &reduceCercle,
-            drawbleList->at(drawbleList, 2));
-        window->setHook(
-            window,
-            mouse,
-            clickL,
-            press,
-            &enlargeCercle,
-            drawbleList->at(drawbleList, 2));
-        window->setHook(
-            window,
-            mouse,
-            clickL,
-            hold,
-            &enlargeCercle,
-            drawbleList->at(drawbleList, 2));
-
+                              "tests/asset/space-shuttle.png",
+                              350, 150));
+        window->setHook(window, mouse, mouvment, &pointerPosition, drawbleList->at(drawbleList, 2));
+        window->setHook(window, mouse, clickR, press, &reduceCercle, drawbleList->at(drawbleList, 2));
+        window->setHook(window, mouse, clickR, hold, &reduceCercle, drawbleList->at(drawbleList, 2));
+        window->setHook(window, mouse, clickL, press, &enlargeCercle, drawbleList->at(drawbleList, 2));
+        window->setHook(window, mouse, clickL, hold, &enlargeCercle, drawbleList->at(drawbleList, 2));
+        window->setHook(window, keyBoard, mc_up, hold, &imUp, drawbleList->at(drawbleList, 4));
+        window->setHook(window, keyBoard, mc_left, hold, &imLeft, drawbleList->at(drawbleList, 4));
+        window->setHook(window, keyBoard, mc_right, hold, &imRight, drawbleList->at(drawbleList, 4));
+        window->setHook(window, keyBoard, mc_down, hold, &imDown, drawbleList->at(drawbleList, 4));
     }
     drawbleList->loop(drawbleList, &drawList, window);
     return (0);
+}
+
+void quit(
+    mc_window *win)
+{
+    win->close(win);
 }
 
 int main()
@@ -114,6 +115,7 @@ int main()
         printf("Oops\n");
         return (84);
     }
+    window->setHook(window, keyBoard, mc_escape, press, &quit, window);
     window->setLoop(window, (loop)&update);
     ret = window->open(window);
     delete(window);

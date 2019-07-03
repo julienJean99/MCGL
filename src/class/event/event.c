@@ -11,22 +11,26 @@
 #include "X11/X.h"
 #include "internal/event/event.h"
 #include "modular/new.h"
+#include "internal/window.h"
 
 static void eventCtor(
     _event *this,
     __attribute__((unused)) va_list *ap)
 {
     this->_mouse = new(MouseEventHandler);
+    this->_text = new(_TextEventHandler);
 }
 
 static void eventDtor(
     _event *this)
 {
     delete(this->_mouse);
+    delete(this->_text);
 }
 
 static void newEvent(
     Object *_this,
+    mc_windowPr *win,
     XEvent *event)
 {
     _event *this = (_event *)_this;
@@ -36,10 +40,12 @@ static void newEvent(
         this->_mouse->buttonEvent(this->_mouse, &event->xbutton);
     } else if (event->type == MotionNotify) {
         this->_mouse->pointerMouvment(this->_mouse, &event->xmotion);
-    } else if (event->type == KeyPress) {
-        printf("k press\n");
-    } else if (event->type == KeyRelease) {
-        printf("k Release\n");
+    } else if (event->type == KeyPress ||
+               event->type == KeyRelease) {
+        this->_text->newEvent(this->_text, &event->xkey);
+    } else if (event->type == ConfigureNotify) {
+        win->_height = event->xconfigure.height;
+        win->_width = event->xconfigure.width;
     }
 }
 
@@ -53,6 +59,8 @@ static void setHook(
     printf("event Handler\n");
     if (category == mouse) {
         this->_mouse->setHook(this->_mouse, ap);
+    } else if (category == keyBoard) {
+        this->_text->setHook(this->_text, ap);
     }
 }
 

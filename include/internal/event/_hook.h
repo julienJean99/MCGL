@@ -9,7 +9,7 @@
 #ifndef __HOOK_H_
 #define __HOOK_H_
 
-#include "class/event/hook.h"
+# include "event/hook.h"
 
 typedef struct {
     mc_hook base;

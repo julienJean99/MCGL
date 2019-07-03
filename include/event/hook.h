@@ -42,7 +42,7 @@ enum keyState{
 
 enum eventCategory {
     mouse,
-    keyBoared,
+    keyBoard,
     window
 };
 

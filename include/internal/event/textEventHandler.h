@@ -12,10 +12,15 @@
 # include <X11/Xlib.h>
 # include "modular/list.h"
 # include "textEvent.h"
+# include "modular/object.h"
 
 typedef struct {
-    void (*activate)(XKeyEvent *);
-    list_t *keylist;
+    Class _base;
+    void (*newEvent)(Object *this, XKeyEvent *);
+    void (*setHook)(Object *this, va_list *);
+    list_t *keyList;
 } _textEventHandler;
+
+extern Class *_TextEventHandler;
 
 #endif //_TEXTEVENTHANDLER_H_

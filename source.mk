@@ -16,7 +16,8 @@ DRAWABLE = drawable.c	\
 EVENT = hook.c					\
 		event.c				\
 		mouseEventHandler.c	\
-		buttonHandler.c
+		buttonHandler.c		\
+		textEventHandler.c
 
 
 CLASS = window.c							\

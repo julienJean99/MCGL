@@ -32,8 +32,7 @@ static void listCtor(
 }
 
 static void listDtor(
-    list_pr *this,
-    __attribute__((unused))va_list *args)
+    list_pr *this)
 {
     while (this->_len) {
         --this->_len;
@@ -92,7 +91,7 @@ static Class *at(
 {
     const list_pr *this = (list_pr *)_this;
 
-    if (this->_len < (idx + 1)) {
+    if (this->_lenMax < (idx + 1)) {
         raise("index out of bound");
     }
     return (this->_tab[idx]);
@@ -130,8 +129,6 @@ static list_t *map(
         return NULL;
     }
     va_start(args, func);
-
-
     if (!argsList || !threadList) {
         return (NULL);
     }
@@ -191,6 +188,28 @@ static void loop(
     return;
 }
 
+static Class *emplace(
+    list_t *this,
+    size_t idx,
+    Class *object)
+{
+    list_pr *_this = (list_pr *)this;
+    Class *tmp = NULL;
+
+    if (_this->_lenMax == idx) {
+        this->pushBack(this, object);
+        return (NULL);
+    } else if (_this->_lenMax < (idx + 1)) {
+        raise("index out of bound\n");
+    }
+    tmp = _this->_tab[idx];
+    _this->_tab[idx] = object;
+    if (_this->_len < idx) {
+        _this->_len = idx + 1;
+    }
+    return(tmp);
+}
+
 static list_pr _description = {
     {
         {
@@ -211,6 +230,7 @@ static list_pr _description = {
         .length = &length,
         .remove = &listRemove,
         .at = &at,
+        .emplace = &emplace,
         .map = &map,
         .loop = &loop
     },

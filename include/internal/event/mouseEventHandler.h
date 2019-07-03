@@ -11,7 +11,7 @@
 #define _MOUSEEVENTHANDLER_H_
 
 # include <X11/Xlib.h>
-# include "class/event/hook.h"
+# include "event/hook.h"
 # include "buttonHandler.h"
 # include "modular/object.h"
 

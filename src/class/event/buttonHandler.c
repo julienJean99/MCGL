@@ -43,7 +43,8 @@ static void keyEvent(
                event->type == ButtonPress){
         this->isPress = true;
     }
-    this->lastEvent = clock();
+    this->lastEvent = event->time;
+    this->lastEventC = clock();
 }
 
 static void setHook(
@@ -77,7 +78,7 @@ void frame(
     mc_key *this = _this;
 
     if (this->isPress &&
-        (clock() - this->lastEvent) > 20000 &&
+        (clock() - this->lastEventC) > 20000 &&
         this->hold) {
         this->hold->trigger(this->hold);
     }
@@ -104,7 +105,8 @@ static mc_key _description = {
     .press = NULL,
     .hold = NULL,
     .release = NULL,
-    .lastEvent = 0
+    .lastEvent = 0,
+    .lastEventC = 0
 };
 
 Class *mc_Key = (Class *)&_description;

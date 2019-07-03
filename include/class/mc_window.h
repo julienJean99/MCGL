@@ -10,7 +10,7 @@
 #define _WINDOW_H_
 
 # include "modular/object.h"
-# include "class/event/hook.h"
+# include "event/hook.h"
 
 struct mc_drawable;
 
@@ -27,6 +27,8 @@ typedef struct
     int (*draw)(Object *this, const Object *);
     /*! used to set hooks: see hook.h for more info */
     void (*setHook)(Object *this, enum eventCategory, ...);
+    /*! closes the window */
+    void (*close)(Object *this);
 } mc_window;
 
 extern Class *mc_Window;
