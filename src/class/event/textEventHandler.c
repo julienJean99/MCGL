@@ -35,9 +35,7 @@ void newEvent(
     unsigned int keySym = XLookupKeysym(event, 0);
     mc_key *tmp = (mc_key *)keylist->at(keylist, keySym);
 
-    printf("sym is %u\n", keySym);
     if (tmp == NULL) {
-        printf("nope\n");
         return;
     }
     tmp->keyEvent(tmp, event);
@@ -54,7 +52,6 @@ void setHook(
     hookFunc func = va_arg(*ap, hookFunc);
     mc_key *tmp = (mc_key *)this->keyList->at(this->keyList, key);
 
-    printf("new key is %u\n", key);
     if (tmp == NULL) {
         tmp = new(mc_Key);
         tmp->setHook(tmp,

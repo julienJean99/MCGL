@@ -36,7 +36,6 @@ static void pointerMouvment(
     _mouseEventHandler *this = _this;
     mc_mouseMouvment *arg = &this->mouveArg;
 
-    printf("mouse mouvment\n");
     arg->x = event->x;
     arg->y = event->y;
     this->mouvment->trigger(this->mouvment);
@@ -48,13 +47,10 @@ static void buttonEvent(
 {
     _mouseEventHandler *this = _this;
 
-    printf("button event\n");
     if (event->button == Button1) {
         this->left->keyEvent(this->left, (XKeyEvent*)event);
-        printf("button left\n");
     } else if (event->button == Button3) {
         this->right->keyEvent(this->right, (XKeyEvent*)event);
-        printf("button left\n");
     }
 }
 
@@ -67,13 +63,11 @@ static void setHook(
     int state = -1;
     hookFunc func = NULL;
 
-    printf("mouse Handler");
     if (event == mouvment) {
         this->mouvment->setFunc(this->mouvment, va_arg(*args, hookFunc));
         this->mouveArg.param = va_arg(*args, Object *);
         this->mouvment->setArg(this->mouvment, &this->mouveArg);
     } else if (event == clickR) {
-        printf("left click\n");
         state = va_arg(*args, int);
         func = va_arg(*args, hookFunc);
         this->right->setHook(this->right,
@@ -82,7 +76,6 @@ static void setHook(
                                  func,
                                  va_arg(*args, Object *)));
     } else if (event == clickL) {
-        printf("left click\n");
         state = va_arg(*args, int);
         func = va_arg(*args, hookFunc);
         this->left->setHook(this->left,

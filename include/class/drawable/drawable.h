@@ -22,6 +22,4 @@ struct mc_drawable {
 
 typedef struct mc_drawable mc_drawable;
 
-extern Class *mc_Drawable;
-
 #endif //_DRAWABLE_H_

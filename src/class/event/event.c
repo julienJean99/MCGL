@@ -56,7 +56,6 @@ static void setHook(
 {
     _event *this = _this;
 
-    printf("event Handler\n");
     if (category == mouse) {
         this->_mouse->setHook(this->_mouse, ap);
     } else if (category == keyBoard) {

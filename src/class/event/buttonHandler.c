@@ -55,7 +55,6 @@ static void setHook(
     mc_key *this = _this;
     _mc_hook *hook= (_mc_hook *)_hook;
 
-    printf("hook %d %d %d\n", state & press, state & hold, state & release);
     if (state & press) {
         if (this->press) {
             delete(this->press);
