@@ -56,4 +56,5 @@ void delete(
         ((Class *)ptr)->__dtor__(ptr);
     }
     free(ptr);
+    ptr = NULL;
 }

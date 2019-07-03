@@ -69,7 +69,7 @@ static int start_update(
             this->_height);
         XSetForeground(display, this->_gc, this->_frColor);
         if (!this->_loop) {
-            return (ret);
+            break;
         }
         ret = this->_loop(this);
         XFlush(display);

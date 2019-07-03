@@ -87,10 +87,8 @@ int update(
                               "tests/asset/space-shuttle.png",
                               350, 150));
         window->setHook(window, mouse, mouvment, &pointerPosition, drawbleList->at(drawbleList, 2));
-        window->setHook(window, mouse, clickR, press, &reduceCercle, drawbleList->at(drawbleList, 2));
-        window->setHook(window, mouse, clickR, hold, &reduceCercle, drawbleList->at(drawbleList, 2));
-        window->setHook(window, mouse, clickL, press, &enlargeCercle, drawbleList->at(drawbleList, 2));
-        window->setHook(window, mouse, clickL, hold, &enlargeCercle, drawbleList->at(drawbleList, 2));
+        window->setHook(window, mouse, clickR, press | hold, &reduceCercle, drawbleList->at(drawbleList, 2));
+        window->setHook(window, mouse, clickL, press | hold, &enlargeCercle, drawbleList->at(drawbleList, 2));
         window->setHook(window, keyBoard, mc_up, hold, &imUp, drawbleList->at(drawbleList, 4));
         window->setHook(window, keyBoard, mc_left, hold, &imLeft, drawbleList->at(drawbleList, 4));
         window->setHook(window, keyBoard, mc_right, hold, &imRight, drawbleList->at(drawbleList, 4));

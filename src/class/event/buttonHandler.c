@@ -50,26 +50,31 @@ static void keyEvent(
 static void setHook(
     Object *_this,
     int state,
-    mc_hook *hook)
+    mc_hook *_hook)
 {
     mc_key *this = _this;
+    _mc_hook *hook= (_mc_hook *)_hook;
 
-    if (state == press) {
+    printf("hook %d %d %d\n", state & press, state & hold, state & release);
+    if (state & press) {
         if (this->press) {
             delete(this->press);
         }
-        this->press = hook;
-    } else if (state == hold) {
+        this->press = new(mc_Hook, hook->_func, hook->_arg);
+    }
+    if (state & hold) {
         if (this->hold) {
             delete(this->hold);
         }
-        this->hold = hook;
-    } else if (state == release) {
+        this->hold = new(mc_Hook, hook->_func, hook->_arg);;
+    }
+    if (state & release) {
         if (this->release) {
             delete(this->release);
         }
-        this->release = hook;
+        this->release = new(mc_Hook, hook->_func, hook->_arg);;
     }
+    delete(_hook);
 }
 
 void frame(

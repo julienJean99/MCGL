@@ -31,9 +31,9 @@ extern Class *mc_Hook;
 /* for each button you can chouse between 3 state */
 
 enum keyState{
-    press ,
-    hold,
-    release
+    press = 1,
+    hold = 2,
+    release = 4
 };
 
 # endif  /* _KEYSTATE_ */
